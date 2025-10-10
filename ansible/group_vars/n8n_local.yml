@@ -1,0 +1,27 @@
+# Environment name - control which env your playbook targets
+env_name: local
+
+project_name: n8n
+project_path: "{{ playbook_dir }}/../{{ project_name }}"
+compose_file: "{{ project_path }}/docker-compose.yml"
+env_file: "{{ project_path }}/.env"
+#start_script: "{{ project_path }}/scripts/update_ngrok_url.sh"
+
+# Environment variables for your .env file
+env_vars:
+  N8N_ENCRYPTION_KEY: "a376de25ecf68323ea29a065292e7e8ef19b1a6363c8cb19c4e1971dd623c2f6"
+  GENERIC_TIMEZONE: "Asia/Singapore"
+  TZ: "Asia/Singapore"
+  N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+  N8N_RUNNERS_ENABLED: "true"
+
+  # NGROK will be injected dynamically by Ansible in local environment,
+  # so you don't need to set it here. For prod, set a fixed URL or leave blank.
+  NGROK: ""
+
+  DB_TYPE: "sqlite"
+  DB_SQLITE_DATABASE: "/home/node/.n8n/n8n-database2.sqlite"
+
+  REDIS_HOST: "redis"
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: "Password1234"

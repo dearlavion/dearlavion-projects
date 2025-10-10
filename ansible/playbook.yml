@@ -1,16 +1,7 @@
----
-- name: Run roles for the n8n project
-  hosts: all
-  vars:
-    some_variable: "example"
-  tasks:
-    - name: Display current environment variables
-      debug:
-        msg:
-          - "Environment: {{ env_name }}"
-          - "Redis Host: {{ redis_host }}"
-          - "Ngrok URL: {{ ngrok_url }}"
-
+- name: Deploy n8n project
+  hosts: n8n_local
+  vars_files:
+    - group_vars/n8n_local.yml
   roles:
     - docker
     - app
