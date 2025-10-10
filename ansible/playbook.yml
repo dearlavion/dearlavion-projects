@@ -1,0 +1,8 @@
+---
+- name: Deploy project
+  hosts: all
+  become: false
+
+  roles:
+    - docker
+    - app
