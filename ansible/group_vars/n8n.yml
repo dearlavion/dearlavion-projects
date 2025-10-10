@@ -1,5 +1,6 @@
+# Common variables for n8n project
 project_name: n8n
-project_path: "{{ playbook_dir }}/../n8n"
+project_path: "{{ playbook_dir }}/../{{ project_name }}"
 compose_file: "{{ project_path }}/docker-compose.yml"
 env_file: "{{ project_path }}/.env"
 start_script: "{{ project_path }}/scripts/update_ngrok_url.sh"

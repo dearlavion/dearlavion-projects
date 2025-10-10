@@ -1,1 +1,34 @@
 ---
+# Generate .env file from Jinja template
+- name: 🔧 Generate .env from template
+  template:
+    src: env.j2
+    dest: "{{ env_file }}"
+    mode: '0644'
+
+# Run a local-only update script (e.g., for ngrok)
+- name: ⚙️ Run ngrok update script (local only)
+  shell: ./scripts/update_ngrok_url.sh
+  args:
+    chdir: "{{ project_path }}"
+  when: env_name == "local"
+
+# Run a production-only setup script
+- name: ⚙️ Run production bootstrap script (prod only)
+  shell: ./scripts/bootstrap_prod.sh
+  args:
+    chdir: "{{ project_path }}"
+  when: env_name == "prod"
+
+# Start containers differently based on environment
+- name: 🐳 Start Docker containers in local
+  shell: docker-compose up -d --build
+  args:
+    chdir: "{{ project_path }}"
+  when: env_name == "local"
+
+- name: 🐳 Start Docker containers in production
+  shell: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+  args:
+    chdir: "{{ project_path }}"
+  when: env_name == "prod"

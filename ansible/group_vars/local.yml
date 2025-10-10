@@ -1,0 +1,7 @@
+# Put local environment-specific variables
+# (like API URLs, Redis host, ngrok URLs, secrets, etc.)
+env_name: "local"
+ngrok_url: "http://localhost:5678"
+redis_host: "localhost"
+redis_port: 6379
+queue_name: "expense-queue"

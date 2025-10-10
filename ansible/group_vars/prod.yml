@@ -1,0 +1,7 @@
+# Put prod environment-specific variables
+# (like API URLs, Redis host, ngrok URLs, secrets, etc.)
+env_name: "prod"
+ngrok_url: "https://abc12345.ngrok-free.app"
+redis_host: "redis-prod.company.com"
+redis_port: 6379
+queue_name: "expense-queue"
