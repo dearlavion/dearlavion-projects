@@ -1,17 +1,28 @@
-✅ How to use
+# 🚀 Ansible Project Initializer
 
-Save the script as init-ansible-project.sh in your dearlavion-projects/ folder.
+This script sets up a ready-to-use Ansible + Docker project structure.
 
-Make it executable:
+---
 
-chmod +x init-ansible-project.sh
+## ✅ How to Use
 
+1. **Save the script**
 
-Run it:
+   Save the script as `init-ansible-project.sh` in your `dearlavion-projects/` directory.
 
-./init-ansible-project.sh
+2. **Make it executable**
 
-🧱 After running, your structure will be:
+   ```bash
+   chmod +x init-ansible-project.sh
+
+3. **Run the script**
+
+   ```bash
+   ./init-ansible-project.sh
+
+4. **🧱 After running, your structure will be:**
+
+```plaintext
 dearlavion-projects/
 ├── n8n/
 │   ├── docker-compose.yml
@@ -21,17 +32,19 @@ dearlavion-projects/
 │   └── scripts/
 │       └── update_ngrok_url.sh
 └── ansible/
-├── inventory.ini
-├── playbook.yml
-├── group_vars/
-│   └── n8n.yml
-├── roles/
-│   ├── app/
-│   │   └── tasks/main.yml
-│   └── docker/
-│       └── tasks/main.yml
-└── templates/
-└── env.j2
+    ├── inventory.ini
+    ├── playbook.yml
+    ├── group_vars/
+    │   └── n8n.yml
+    ├── roles/
+    │   ├── app/
+    │   │   └── tasks/main.yml
+    │   └── docker/
+    │       └── tasks/main.yml
+    └── templates/
+        └── env.j2
+```
+5. **Run the project later with:**
 
-✅ Run the project later with:
-ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --limit n8n
+```bash
+   ansible-playbook -i ansible/inventory.ini ansible/playbook.yml --limit n8n
