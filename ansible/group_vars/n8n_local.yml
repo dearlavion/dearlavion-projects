@@ -2,9 +2,9 @@
 env_name: local
 
 project_name: n8n
-project_path: "{{ playbook_dir }}/../{{ project_name }}"
-compose_file: "{{ project_path }}/docker-compose.yml"
-env_file: "{{ project_path }}/.env"
+#project_path: "{{ playbook_dir }}/../{{ project_name }}"
+#compose_file: "{{ project_path }}/docker-compose.yml"
+#env_file: "{{ project_path }}/.env"
 #start_script: "{{ project_path }}/scripts/update_ngrok_url.sh"
 
 # Environment variables for your .env file

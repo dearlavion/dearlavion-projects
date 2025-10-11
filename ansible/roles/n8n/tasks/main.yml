@@ -1,77 +1,10 @@
----
-# Generate .env file from Jinja template
-
-- name: 🌐 Get active ngrok HTTPS URL (local only)
-  uri:
-    url: http://localhost:4040/api/tunnels
-    return_content: yes
-  register: ngrok_api_response
-  failed_when: ngrok_api_response.status != 200
+- import_tasks: pre-requisite.yml
   when: env_name == "local"
 
-- name: 🔍 Parse ngrok public URL (HTTPS) (local only)
-  set_fact:
-    ngrok_url: >-
-      {{ (ngrok_api_response.json.tunnels
-          | selectattr('proto', 'equalto', 'https')
-          | list)[0].public_url | default('') }}
+- import_tasks: common.yml
+
+- import_tasks: local.yml
   when: env_name == "local"
 
-- name: ❌ Fail if ngrok URL is not available (local only)
-  fail:
-    msg: "Could not find an HTTPS ngrok tunnel. Is ngrok running?"
-  when: env_name == "local" and ngrok_url == ""
-
-- name: 🧪 Update env_vars with NGROK (local only)
-  set_fact:
-    env_vars: "{{ env_vars | combine({'NGROK': ngrok_url}) }}"
-  when: env_name == "local"
-
-- name: 🧪 Show project paths
-  debug:
-    msg:
-      - "Project Name: {{ project_name }}"
-      - "Project Path: {{ project_path }}"
-      - "Compose File: {{ compose_file }}"
-      - "Env File: {{ env_file }}"
-      #- "Start Script: {{ start_script }}"
-      - "Environment: {{ env_name }}"
-      - "NGROK: {{ env_vars.NGROK | default('not set') }}"
-
-- name: 🔧 Generate .env from template
-  template:
-    src: env.j2
-    dest: "{{ env_file }}"
-    mode: '0644'
-
-# Optional: Run any additional local setup script
-- name: ⚙️ Run production bootstrap script (prod only)
-  shell: ./scripts/bootstrap_prod.sh
-  args:
-    chdir: "{{ project_path }}"
+- import_tasks: prod.yml
   when: env_name == "prod"
-
-# Start containers based on environment
-- name: 🐳 Start Docker containers in local
-  shell: docker-compose up -d --build
-  args:
-    chdir: "{{ project_path }}"
-  when: env_name == "local"
-
-- name: 🐳 Start Docker containers in production
-  shell: docker-compose -f docker-compose.yml -f docker-compose.n8n_prod.yml up -d --build
-  args:
-    chdir: "{{ project_path }}"
-  when: env_name == "prod"
-
-- name: 🔁 Rebuild and restart Docker containers
-  shell: docker-compose down && docker-compose up -d --build
-  args:
-    chdir: "{{ project_path }}"
-  tags: rebuild
-
-- name: Stop Docker containers
-  shell: docker-compose down
-  args:
-    chdir: "{{ project_path }}"
-  tags: stop

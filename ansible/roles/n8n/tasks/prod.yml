@@ -1,0 +1,11 @@
+- name: ⚙️ Run production bootstrap script (prod only)
+  shell: ./scripts/bootstrap_prod.sh
+  args:
+    chdir: "{{ project_path }}"
+  tags: start
+
+- name: 🐳 Start Docker containers in production
+  shell: docker-compose -f docker-compose.yml -f docker-compose.n8n_prod.yml up -d --build
+  args:
+    chdir: "{{ project_path }}"
+  tags: start

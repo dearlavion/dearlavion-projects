@@ -1,15 +1,29 @@
-# To execute: make rebuild-local
+# Usage examples
+# Run n8n on local
+# make run PROJECT=n8n ENV=local
 
-INVENTORY=inventory.ini
+# Stop n8n on prod
+# make stop PROJECT=n8n ENV=prod
 
-run-local:
-	ansible-playbook -i $(INVENTORY) playbook.yml --limit n8n_local -e env_name=local
+# Rebuild grafana on local
+# make rebuild PROJECT=grafana ENV=local
 
-rebuild-local:
-	ansible-playbook -i $(INVENTORY) playbook.yml --limit n8n_local --tags rebuild -e env_name=local
 
-stop-local:
-	ansible-playbook -i $(INVENTORY) playbook.yml --limit n8n_local --tags stop -e env_name=local
+# Set default values if not provided
+PROJECT ?= n8n
+ENV ?= local
+INVENTORY = inventory/hosts.ini
 
-prod-deploy:
-	ansible-playbook -i $(INVENTORY) playbook.yml --limit n8n_prod -e env_name=prod
+# Derive dynamic values
+PLAYBOOK = playbook/$(PROJECT).yml
+TARGET_GROUP = $(PROJECT)_$(ENV)
+
+# Generic commands
+run:
+	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"
+
+stop:
+	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) --tags stop -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"
+
+rebuild:
+	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) --tags rebuild -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"

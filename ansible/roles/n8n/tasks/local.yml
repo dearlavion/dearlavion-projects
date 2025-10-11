@@ -1,0 +1,32 @@
+- name: 🌐 Get active ngrok HTTPS URL (local only)
+  uri:
+    url: http://localhost:4040/api/tunnels
+    return_content: yes
+  register: ngrok_api_response
+  failed_when: ngrok_api_response.status != 200
+  tags: start
+
+- name: 🔍 Parse ngrok public URL (HTTPS) (local only)
+  set_fact:
+    ngrok_url: >-
+      {{ (ngrok_api_response.json.tunnels
+          | selectattr('proto', 'equalto', 'https')
+          | list)[0].public_url | default('') }}
+  tags: start
+
+- name: ❌ Fail if ngrok URL is not available (local only)
+  fail:
+    msg: "Could not find an HTTPS ngrok tunnel. Is ngrok running?"
+  when: ngrok_url == ""
+  tags: start
+
+- name: 🧪 Update env_vars with NGROK (local only)
+  set_fact:
+    env_vars: "{{ env_vars | combine({'NGROK': ngrok_url}) }}"
+  tags: start
+
+- name: 🐳 Start Docker containers in local
+  shell: docker-compose up -d --build
+  args:
+    chdir: "{{ project_path }}"
+  tags: start

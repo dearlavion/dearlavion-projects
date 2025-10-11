@@ -1,0 +1,17 @@
+- name: 🔧 Generate .env from template
+  template:
+    src: ../templates/env.j2    # relative to the playbook file
+    dest: "{{ env_file }}"
+    mode: '0644'
+
+- name: 🔁 Rebuild and restart Docker containers
+  shell: docker-compose down && docker-compose up -d --build
+  args:
+    chdir: "{{ project_path }}"
+  tags: rebuild
+
+- name: Stop Docker containers
+  shell: docker-compose down
+  args:
+    chdir: "{{ project_path }}"
+  tags: stop

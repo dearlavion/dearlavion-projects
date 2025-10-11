@@ -1,7 +1,0 @@
-- name: Deploy n8n project
-  hosts: n8n_local
-  vars_files:
-    - group_vars/n8n_local.yml
-  roles:
-    - docker
-    - n8n
