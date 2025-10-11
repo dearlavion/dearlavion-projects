@@ -1,45 +1,6 @@
 - name: Deploy n8n project
   hosts: "{{ target_host }}"
   gather_facts: false
-  tasks:
-    - name: Include env_vars vars file explicitly
-      include_vars:
-        file: "../group_vars/n8n_local.yml"
-        name: loaded_vars
 
-    - name: Set project_path variable
-      set_fact:
-        project_path: "{{ playbook_dir }}/../../{{ loaded_vars.project_name }}"
-
-    - name: Set other derived variables
-      set_fact:
-        compose_file: "{{ project_path }}/docker-compose.yml"
-        env_file: "{{ project_path }}/.env"
-        env_vars: "{{ loaded_vars.env_vars }}"
-        env_name: "{{ loaded_vars.env_name }}"
-
-    - name: Debug env_name
-      debug:
-        var: env_name
-
-    - name: Debug env_vars
-      debug:
-        var: env_vars
-
-    - name: Debug project_path
-      debug:
-        var: project_path
-
-    - name: Debug compose_file
-      debug:
-        var: compose_file
-
-    - name: Debug env_file
-      debug:
-        var: env_file
-
-- name: Deploy n8n project role
-  hosts: "{{ target_host }}"
-  gather_facts: false
   roles:
     - n8n

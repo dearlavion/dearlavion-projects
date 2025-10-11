@@ -1,0 +1,17 @@
+- name: 🔁 Load env_vars from group_vars file
+  include_vars:
+    file: "{{ playbook_dir }}/../group_vars/{{ target_group_file }}.yml"
+    name: loaded_vars
+
+- name: 💡 Set project name and path
+  set_fact:
+    project_name: "{{ loaded_vars.project_name | default('n8n') }}"
+    project_path: "{{ playbook_dir }}/../../{{ loaded_vars.project_name }}"
+
+- name: 💡 Set compose and env file paths
+  set_fact:
+    compose_file: "{{ project_path }}/docker-compose.yml"
+    env_file: "{{ project_path }}/.env"
+    env_vars: "{{ loaded_vars.env_vars }}"
+    env_name: "{{ loaded_vars.env_name }}"
+

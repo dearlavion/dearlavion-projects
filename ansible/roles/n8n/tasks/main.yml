@@ -1,4 +1,7 @@
-- import_tasks: pre-requisite.yml
+- import_tasks: setup-env.yml
+  tags: always
+
+- import_tasks: local-ngrok-url-update.yml
   when: env_name == "local"
 
 - import_tasks: common.yml
