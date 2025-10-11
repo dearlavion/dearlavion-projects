@@ -63,3 +63,15 @@
   args:
     chdir: "{{ project_path }}"
   when: env_name == "prod"
+
+- name: 🔁 Rebuild and restart Docker containers
+  shell: docker-compose down && docker-compose up -d --build
+  args:
+    chdir: "{{ project_path }}"
+  tags: rebuild
+
+- name: Stop Docker containers
+  shell: docker-compose down
+  args:
+    chdir: "{{ project_path }}"
+  tags: stop

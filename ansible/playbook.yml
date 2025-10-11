@@ -4,4 +4,4 @@
     - group_vars/n8n_local.yml
   roles:
     - docker
-    - app
+    - n8n
