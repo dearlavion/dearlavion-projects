@@ -27,7 +27,9 @@ touch "$project"/{docker-compose.yml,Dockerfile,.env}
 # Create Ansible structure (if not exists)
 # ------------------------------
 mkdir -p ansible/{inventory,playbook,group_vars,templates}
-mkdir -p ansible/roles/{docker,ngrok,"$project"/tasks}
+
+# Create only the dynamic project role directory with tasks folder
+mkdir -p ansible/roles/"$project"/tasks
 
 # ------------------------------
 # Inventory setup
@@ -39,39 +41,38 @@ if [ ! -f "$inventory_file" ]; then
 fi
 
 # Add local group to inventory
-if ! grep -q "[$project"_local"]" "$inventory_file"; then
+if ! grep -q "\[${project}_local\]" "$inventory_file"; then
   echo -e "\n[${project}_local]" >> "$inventory_file"
   echo "localhost ansible_connection=local" >> "$inventory_file"
 fi
 
-# Add public group to inventory
-if ! grep -q "[$project"_public"]" "$inventory_file"; then
-  echo -e "\n[${project}_public]" >> "$inventory_file"
-  echo "#your_public_host ansible_user=ubuntu" >> "$inventory_file"
+# Add prod group to inventory
+if ! grep -q "\[${project}_prod\]" "$inventory_file"; then
+  echo -e "\n[${project}_prod]" >> "$inventory_file"
+  echo "#your_prod_host ansible_user=ubuntu" >> "$inventory_file"
 fi
 
 # ------------------------------
 # Create group_vars files
 # ------------------------------
 cat <<EOF > ansible/group_vars/${project}_local.yml
-${project}_port: 5678
 use_ngrok: true
+ngrok_authtoken: "your-ngrok-authtoken-here"
+local_port: 5678
 EOF
 
-cat <<EOF > ansible/group_vars/${project}_public.yml
-${project}_port: 5678
+cat <<EOF > ansible/group_vars/${project}_prod.yml
 use_ngrok: false
+local_port: 5678
 EOF
 
 # ------------------------------
-# Create empty main.yml files for roles
+# Create empty main.yml file for the project role
 # ------------------------------
-for role in docker ngrok "$project"; do
-  role_tasks="ansible/roles/$role/tasks/main.yml"
-  if [ ! -f "$role_tasks" ]; then
-    echo "---" > "$role_tasks"
-  fi
-done
+role_tasks="ansible/roles/$project/tasks/main.yml"
+if [ ! -f "$role_tasks" ]; then
+  echo "---" > "$role_tasks"
+fi
 
 # ------------------------------
 # Create playbook for the project
@@ -82,11 +83,10 @@ if [ ! -f "$playbook_file" ]; then
   cat <<EOF > "$playbook_file"
 ---
 - name: Setup $project environment
-  hosts: ${project}_local  # or ${project}_public
+  hosts: ${project}_local  # or ${project}_prod
   become: true
 
   roles:
-    - docker
     - $project
     - { role: ngrok, when: use_ngrok | default(false) }
 EOF
@@ -95,7 +95,9 @@ fi
 # ------------------------------
 # Create env template (optional)
 # ------------------------------
-touch ansible/templates/env.j2
+if [ ! -f ansible/templates/env.j2 ]; then
+  touch ansible/templates/env.j2
+fi
 
 # ------------------------------
 # Done

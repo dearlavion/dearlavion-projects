@@ -32,7 +32,6 @@ This script sets up a ready-to-use Ansible + Docker project structure.
     │   ├── .env
     │   ├── src/
     │   └── scripts/
-    │       └── update_ngrok_url.sh
     └── ansible/
         ├── inventory/
         │   └── hosts.ini
@@ -40,7 +39,7 @@ This script sets up a ready-to-use Ansible + Docker project structure.
         │   └── n8n.yml
         ├── group_vars/
         │   ├── n8n_local.yml
-        │   └── n8n_public.yml
+        │   └── n8n_prod.yml
         ├── roles/
         │   ├── n8n/
         │   │   └── tasks/
