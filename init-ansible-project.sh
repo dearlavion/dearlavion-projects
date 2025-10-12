@@ -27,8 +27,6 @@ touch "$project"/{docker-compose.yml,Dockerfile,.env}
 # Create Ansible structure (if not exists)
 # ------------------------------
 mkdir -p ansible/{inventory,playbook,group_vars,templates}
-
-# Create only the dynamic project role directory with tasks folder
 mkdir -p ansible/roles/"$project"/tasks
 
 # ------------------------------
@@ -38,18 +36,31 @@ inventory_file="ansible/inventory/hosts.ini"
 
 if [ ! -f "$inventory_file" ]; then
   echo "# Ansible inventory" > "$inventory_file"
+  echo "# The filename inside group_vars/ corresponds to an inventory group name." >> "$inventory_file"
 fi
 
-# Add local group to inventory
+# Add project local group
 if ! grep -q "\[${project}_local\]" "$inventory_file"; then
   echo -e "\n[${project}_local]" >> "$inventory_file"
-  echo "localhost ansible_connection=local" >> "$inventory_file"
+  echo "localhost ansible_connection=local project_name=$project env=local" >> "$inventory_file"
 fi
 
-# Add prod group to inventory
+# Add project prod group
 if ! grep -q "\[${project}_prod\]" "$inventory_file"; then
   echo -e "\n[${project}_prod]" >> "$inventory_file"
-  echo "#your_prod_host ansible_user=ubuntu" >> "$inventory_file"
+  echo "#prod-server ansible_connection=ssh ansible_user=ubuntu project_name=$project env=prod" >> "$inventory_file"
+fi
+
+# Add ngrok local group
+if ! grep -q "\[ngrok_local\]" "$inventory_file"; then
+  echo -e "\n[ngrok_local]" >> "$inventory_file"
+  echo "localhost ansible_connection=local project_name=$project env=local" >> "$inventory_file"
+fi
+
+# Add ngrok prod group
+if ! grep -q "\[ngrok_prod\]" "$inventory_file"; then
+  echo -e "\n[ngrok_prod]" >> "$inventory_file"
+  echo "#your_prod_host ansible_user=ubuntu project_name=$project env=prod" >> "$inventory_file"
 fi
 
 # ------------------------------
@@ -67,7 +78,7 @@ local_port: 5678
 EOF
 
 # ------------------------------
-# Create empty main.yml file for the project role
+# Create empty main.yml for project role
 # ------------------------------
 role_tasks="ansible/roles/$project/tasks/main.yml"
 if [ ! -f "$role_tasks" ]; then
@@ -75,7 +86,7 @@ if [ ! -f "$role_tasks" ]; then
 fi
 
 # ------------------------------
-# Create playbook for the project
+# Create project-specific playbook
 # ------------------------------
 playbook_file="ansible/playbook/${project}.yml"
 
