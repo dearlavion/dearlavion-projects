@@ -5,7 +5,7 @@
 # ------------------------------
 BASE_DIR="dearlavion-projects"
 
-# Check if you're in the right directory
+# Ensure script is run from inside BASE_DIR
 if [ "$(basename "$PWD")" != "$BASE_DIR" ]; then
   echo "❌ Please run this script from inside the '$BASE_DIR/' directory."
   exit 1
@@ -14,64 +14,87 @@ fi
 # ------------------------------
 # INPUT: Project name
 # ------------------------------
-read -p "Enter project name (e.g. n8n): " project
+read -p "Enter new project name (e.g. myapp): " project
+project=$(echo "$project" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]_-')
 
 # ------------------------------
-# Create project structure
+# Create project directory
 # ------------------------------
-mkdir -p $project/{src,scripts}
-touch $project/{docker-compose.yml,Dockerfile,.env}
-touch $project/scripts/update_ngrok_url.sh
+mkdir -p "$project"/{src,scripts}
+touch "$project"/{docker-compose.yml,Dockerfile,.env}
 
 # ------------------------------
-# Create Ansible base structure
+# Create Ansible structure (if not exists)
 # ------------------------------
-mkdir -p ansible/{roles/{app,docker}/tasks,group_vars,templates}
+mkdir -p ansible/{inventory,playbook,group_vars,templates}
+mkdir -p ansible/roles/{docker,ngrok,"$project"/tasks}
 
-# Create inventory if not exists
-if [ ! -f ansible/inventory.ini ]; then
-  touch ansible/inventory.ini
-  echo "# Inventory file" > ansible/inventory.ini
+# ------------------------------
+# Inventory setup
+# ------------------------------
+inventory_file="ansible/inventory/hosts.ini"
+
+if [ ! -f "$inventory_file" ]; then
+  echo "# Ansible inventory" > "$inventory_file"
 fi
 
-# Add project to inventory.ini
-if ! grep -q "\[$project\]" ansible/inventory.ini; then
-  echo -e "\n[$project]" >> ansible/inventory.ini
-  echo "localhost ansible_connection=local project_name=$project" >> ansible/inventory.ini
+# Add local group to inventory
+if ! grep -q "[$project"_local"]" "$inventory_file"; then
+  echo -e "\n[${project}_local]" >> "$inventory_file"
+  echo "localhost ansible_connection=local" >> "$inventory_file"
 fi
 
-# Create group vars file
-cat <<EOF > ansible/group_vars/$project.yml
-project_name: $project
-project_path: "{{ playbook_dir }}/../$project"
-compose_file: "{{ project_path }}/docker-compose.yml"
-env_file: "{{ project_path }}/.env"
-start_script: "{{ project_path }}/scripts/update_ngrok_url.sh"
+# Add public group to inventory
+if ! grep -q "[$project"_public"]" "$inventory_file"; then
+  echo -e "\n[${project}_public]" >> "$inventory_file"
+  echo "#your_public_host ansible_user=ubuntu" >> "$inventory_file"
+fi
+
+# ------------------------------
+# Create group_vars files
+# ------------------------------
+cat <<EOF > ansible/group_vars/${project}_local.yml
+${project}_port: 5678
+use_ngrok: true
 EOF
 
-# Create default task files if they don't exist
-for role in app docker; do
-  role_file="ansible/roles/$role/tasks/main.yml"
-  if [ ! -f "$role_file" ]; then
-    echo "---" > "$role_file"
+cat <<EOF > ansible/group_vars/${project}_public.yml
+${project}_port: 5678
+use_ngrok: false
+EOF
+
+# ------------------------------
+# Create empty main.yml files for roles
+# ------------------------------
+for role in docker ngrok "$project"; do
+  role_tasks="ansible/roles/$role/tasks/main.yml"
+  if [ ! -f "$role_tasks" ]; then
+    echo "---" > "$role_tasks"
   fi
 done
 
-# Create base playbook if it doesn't exist
-if [ ! -f ansible/playbook.yml ]; then
-  cat <<EOF > ansible/playbook.yml
+# ------------------------------
+# Create playbook for the project
+# ------------------------------
+playbook_file="ansible/playbook/${project}.yml"
+
+if [ ! -f "$playbook_file" ]; then
+  cat <<EOF > "$playbook_file"
 ---
-- name: Deploy project
-  hosts: all
-  become: false
+- name: Setup $project environment
+  hosts: ${project}_local  # or ${project}_public
+  become: true
 
   roles:
     - docker
-    - app
+    - $project
+    - { role: ngrok, when: use_ngrok | default(false) }
 EOF
 fi
 
-# Optional: Create env template
+# ------------------------------
+# Create env template (optional)
+# ------------------------------
 touch ansible/templates/env.j2
 
 # ------------------------------

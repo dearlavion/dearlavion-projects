@@ -22,28 +22,39 @@ This script sets up a ready-to-use Ansible + Docker project structure.
 
 4. **🧱 After running, your structure will be:**
 
-   ```plaintext
-   dearlavion-projects/
-   ├── n8n/
-   │   ├── docker-compose.yml
-   │   ├── Dockerfile
-   │   ├── .env
-   │   ├── src/
-   │   └── scripts/
-   │       └── update_ngrok_url.sh
-   └── ansible/
-       ├── inventory.ini
-       ├── playbook.yml
-       ├── group_vars/
-       │   └── n8n.yml
-       ├── roles/
-       │   ├── app/
-       │   │   └── tasks/main.yml
-       │   └── docker/
-       │       └── tasks/main.yml
-       └── templates/
-           └── env.j2
-   ```
+    ```plaintext
+    📁 Project Structure
+    
+    dearlavion-projects/
+    ├── n8n/
+    │   ├── docker-compose.yml
+    │   ├── Dockerfile
+    │   ├── .env
+    │   ├── src/
+    │   └── scripts/
+    │       └── update_ngrok_url.sh
+    └── ansible/
+        ├── inventory/
+        │   └── hosts.ini
+        ├── playbook/
+        │   └── n8n.yml
+        ├── group_vars/
+        │   ├── n8n_local.yml
+        │   └── n8n_public.yml
+        ├── roles/
+        │   ├── n8n/
+        │   │   └── tasks/
+        │   │       └── main.yml
+        │   ├── docker/
+        │   │   └── tasks/
+        │   │       └── main.yml
+        │   └── ngrok/
+        │       └── tasks/
+        │           └── main.yml
+        └── templates/
+            └── env.j2
+    ```
+
 5. **Run the project later with:**
 
    ```bash
