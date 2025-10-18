@@ -68,7 +68,7 @@ fi
 # ------------------------------
 cat <<EOF > ansible/group_vars/${project}_local.yml
 use_ngrok: true
-ngrok_authtoken: "your-ngrok-authtoken-here"
+ngrok_auth_token: "your-ngrok-auth-token-here"
 local_port: 5678
 EOF
 
