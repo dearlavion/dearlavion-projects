@@ -48,3 +48,26 @@
   poll: 0
   when: ngrok_process.rc != 0
   register: ngrok_run
+
+# 🕒 Wait until ngrok's local API (4040) is up — ensures it's really running
+- name: Wait for ngrok API (localhost:4040) to become available
+  wait_for:
+    host: 127.0.0.1
+    port: 4040
+    delay: 2
+    timeout: 20
+    state: started
+  when: ngrok_process.rc != 0
+
+# 🌐 Verify that ngrok created at least one tunnel
+- name: Check ngrok tunnel is active
+  shell: curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[].public_url'
+  register: ngrok_tunnel_check
+  changed_when: false
+  failed_when: ngrok_tunnel_check.stdout == ""
+  when: ngrok_process.rc != 0
+
+# 💡 Show the active ngrok public URL
+- debug:
+    msg: "✅ ngrok tunnel is live at {{ ngrok_tunnel_check.stdout }}"
+  when: ngrok_process.rc != 0
