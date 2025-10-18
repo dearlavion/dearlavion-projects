@@ -1,11 +1,11 @@
 # Environment name - control which env your playbook targets
 env_name: local
-
 project_name: n8n
-#project_path: "{{ playbook_dir }}/../{{ project_name }}"
-#compose_file: "{{ project_path }}/docker-compose.yml"
-#env_file: "{{ project_path }}/.env"
-#start_script: "{{ project_path }}/scripts/update_ngrok_url.sh"
+
+#for ngrok server
+use_ngrok: true
+ngrok_auth_token: YOUR_AUTH_TOKEN_HERE
+ngrok_local_port: 5678
 
 # Environment variables for your .env file
 env_vars:

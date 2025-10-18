@@ -1,0 +1,50 @@
+- name: Find ngrok binary path
+  shell: which ngrok
+  register: ngrok_path
+  changed_when: false
+
+- name: Set ngrok binary path fact
+  set_fact:
+    ngrok_bin: "{{ ngrok_path.stdout | default('/usr/local/bin/ngrok') }}"
+
+- name: Check if ngrok is already installed
+  stat:
+    path: "{{ ngrok_bin }}"
+  register: ngrok_stat
+
+- name: Download ngrok (only if not installed)
+  get_url:
+    url: https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-darwin-amd64.zip
+    dest: /tmp/ngrok.zip
+  when: not ngrok_stat.stat.exists
+
+- name: Unzip ngrok (only if not installed)
+  unarchive:
+    src: /tmp/ngrok.zip
+    dest: "{{ ngrok_bin | dirname }}/"
+    remote_src: yes
+  when: not ngrok_stat.stat.exists
+
+- name: Make ngrok executable
+  file:
+    path: "{{ ngrok_bin }}"
+    mode: '0755'
+    state: file
+  when: not ngrok_stat.stat.exists
+
+- name: Add ngrok authtoken
+  shell: "{{ ngrok_bin }} config add-authtoken \"{{ ngrok_auth_token }}\""
+  args:
+    creates: ~/.config/ngrok/ngrok.yml
+
+- name: Check if ngrok is already running on port {{ ngrok_local_port }}
+  shell: pgrep -f "ngrok http {{ ngrok_local_port }}"
+  register: ngrok_process
+  ignore_errors: true
+
+- name: Run ngrok in background if not already running
+  shell: nohup {{ ngrok_bin }} http {{ ngrok_local_port }} > /tmp/ngrok.log 2>&1 &
+  async: 5
+  poll: 0
+  when: ngrok_process.rc != 0
+  register: ngrok_run

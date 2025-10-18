@@ -1,6 +1,16 @@
+---
 - name: Deploy n8n project
-  hosts: "{{ target_host }}"
+  hosts: "{{ target_group_file }}"
   gather_facts: false
 
+  pre_tasks:
+    - debug:
+        msg:
+          - "use_ngrok={{ use_ngrok }}"
+          - "ngrok_local_port={{ ngrok_local_port }}"
+          - "env_name={{ env_name }}"
+
   roles:
+    - role: ngrok
+      when: use_ngrok | bool and ('stop' not in ansible_run_tags)
     - n8n
