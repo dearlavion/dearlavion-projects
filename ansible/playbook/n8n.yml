@@ -3,6 +3,9 @@
   hosts: "{{ target_group_file }}"
   gather_facts: false
 
+  vars_files:
+    - "../group_vars/{{ target_group_file }}.yml"
+
   pre_tasks:
     - debug:
         msg:
