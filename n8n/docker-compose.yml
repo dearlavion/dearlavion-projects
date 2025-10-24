@@ -18,12 +18,16 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - /Users/alysson/dev/db/sqlite-n8n-db:/home/node/.n8n
       - /Users/alysson/dev/db/sqlite-n8n-expense-tracker-db:/data/expense-tracker
     depends_on:
-      - redis
-      - mongo
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
 
   redis:
@@ -67,3 +71,8 @@ services:
     volumes:
       - /Users/alysson/dev/db/mongo-n8n-data:/data/db
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

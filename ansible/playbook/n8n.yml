@@ -15,5 +15,6 @@
 
   roles:
     - role: ngrok
-      when: use_ngrok | bool and ('stop' not in ansible_run_tags)
+      when: use_ngrok | bool
+      #when: use_ngrok | bool and ('stop' not in ansible_run_tags)
     - n8n

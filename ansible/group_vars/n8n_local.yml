@@ -6,6 +6,7 @@ project_name: n8n
 use_ngrok: true
 ngrok_auth_token: "30YMR2ia6phQ4XdQD73N9PAdFGw_7rwkaGMtMgGtzdt2cdcZX"
 ngrok_local_port: 5678
+ngrok_hostname: "my.dearlavion.site.ngrok.pizza"
 
 # Environment variables for your .env file
 env_vars:

@@ -5,7 +5,7 @@
   register: ngrok_api_response
   failed_when: ngrok_api_response.status != 200
   when: env_name == "local"
-  tags: start
+  tags: ["start", "rebuild"]
 
 - name: 🔍 Parse ngrok public URL (HTTPS) (local only)
   set_fact:
@@ -14,16 +14,16 @@
           | selectattr('proto', 'equalto', 'https')
           | list)[0].public_url | default('') }}
   when: env_name == "local"
-  tags: start
+  tags: ["start", "rebuild"]
 
 - name: ❌ Fail if ngrok URL is not available (local only)
   fail:
     msg: "Could not find an HTTPS ngrok tunnel. Is ngrok running?"
   when: env_name == "local" and ngrok_url == ""
-  tags: start
+  tags: ["start", "rebuild"]
 
 - name: 🧪 Update env_vars with NGROK (local only)
   set_fact:
     env_vars: "{{ env_vars | combine({'NGROK': ngrok_url}) }}"
   when: env_name == "local"
-  tags: start
+  tags: ["start", "rebuild"]

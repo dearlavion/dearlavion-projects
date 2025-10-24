@@ -3,9 +3,7 @@
     src: ../templates/env.j2    # relative to the playbook file
     dest: "{{ env_file }}"
     mode: '0644'
-  tags:
-    - setup
-    - rebuild
+  tags: rebuild
 
 - name: 🔁 Rebuild and restart Docker containers
   shell: docker-compose down && docker-compose up -d --build

@@ -20,7 +20,7 @@ TARGET_GROUP = $(PROJECT)_$(ENV)
 
 # Generic commands
 run:
-	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"
+	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) --tags start -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"
 
 stop:
 	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) --tags stop -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"
