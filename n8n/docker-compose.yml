@@ -23,6 +23,7 @@ services:
       - /Users/alysson/dev/db/sqlite-n8n-expense-tracker-db:/data/expense-tracker
     depends_on:
       - redis
+      - mongo
     restart: unless-stopped
 
   redis:
@@ -53,4 +54,16 @@ services:
     depends_on:
       - redis
       - n8n
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - /Users/alysson/dev/db/mongo-n8n-data:/data/db
     restart: unless-stopped
