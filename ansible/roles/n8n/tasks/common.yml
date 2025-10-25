@@ -3,13 +3,14 @@
     src: ../templates/env.j2    # relative to the playbook file
     dest: "{{ env_file }}"
     mode: '0644'
-  tags: rebuild
+  tags: start
 
-- name: 🔁 Rebuild and restart Docker containers
-  shell: docker-compose down && docker-compose up -d --build
+- name: 🔁 Rebuild Docker containers
+  shell: docker-compose down && docker-compose build
+  #shell: docker-compose down && docker-compose up -d --build
   args:
     chdir: "{{ project_path }}"
-  tags: rebuild
+  tags: start
 
 - name: Stop Docker containers
   shell: docker-compose down
