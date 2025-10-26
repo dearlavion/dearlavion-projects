@@ -27,3 +27,11 @@ stop:
 
 rebuild:
 	ansible-playbook $(PLAYBOOK) -i $(INVENTORY) --tags rebuild -e "target_host=$(TARGET_GROUP) target_group_file=$(TARGET_GROUP) env_name=$(ENV)"
+
+# Convenience aliases for frontend
+# make frontend-run
+frontend-run:
+	ansible-playbook playbook/frontend.yml --ask-become-pass --tags start
+
+frontend-stop:
+	ansible-playbook playbook/frontend.yml --ask-become-pass --tags stop

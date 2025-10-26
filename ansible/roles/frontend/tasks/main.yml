@@ -7,36 +7,42 @@
   args:
     creates: /opt/homebrew/bin/brew
   become: false
+  tags: ["start"]
 
 - name: Ensure Node.js installed via Homebrew
   homebrew:
     name: node
     state: present
   become: false
+  tags: ["start"]
 
 - name: Install Angular CLI globally
   npm:
     name: "@angular/cli"
     global: yes
   become: false
+  tags: ["start"]
 
 - name: Install project dependencies
   command: npm install
   args:
     chdir: "{{ ui_project_path }}"
   become: false
+  tags: ["start"]
 
 - name: Build Angular app (production)
   command: npm run build -- --configuration production
   args:
     chdir: "{{ ui_project_path }}"
   become: false
+  tags: ["start"]
 
 - name: Ensure nginx installed via Homebrew
   homebrew:
     name: nginx
     state: present
   become: false
+  tags: ["start"]
 
 # --- Directory setup for Nginx and Web Root ---
 - name: Ensure nginx servers directory exists
@@ -45,6 +51,7 @@
     state: directory
     mode: '0755'
   become: true
+  tags: ["start"]
 
 - name: Ensure nginx web root exists
   file:
@@ -52,6 +59,7 @@
     state: directory
     mode: '0755'
   become: true
+  tags: ["start"]
 
 - name: Ensure nginx log directory exists
   file:
@@ -59,6 +67,7 @@
     state: directory
     mode: '0755'
   become: true
+  tags: ["start"]
 
 - name: Ensure nginx run directory exists
   file:
@@ -66,6 +75,7 @@
     state: directory
     mode: '0755'
   become: true
+  tags: ["start"]
 
 # --- Deploy Angular build ---
 - name: Copy built UI to nginx folder
@@ -74,6 +84,7 @@
     dest: "/opt/homebrew/var/www/dearlavion/"
     recursive: yes
   become: false
+  tags: ["start"]
 
 # --- Deploy Nginx configuration ---
 - name: Deploy nginx configuration
@@ -81,11 +92,19 @@
     src: "nginx-frontend.conf.j2"
     dest: "/opt/homebrew/etc/nginx/servers/dearlavion.conf"
   become: false
+  tags: ["start"]
 
 - name: Test nginx configuration
   command: nginx -t
   become: true
+  tags: ["start"]
 
 - name: Restart nginx
   shell: brew services restart nginx
   become: false
+  tags: ["start"]
+
+- name: Stop nginx service
+  shell: brew services stop nginx
+  become: false
+  tags: ["stop"]
