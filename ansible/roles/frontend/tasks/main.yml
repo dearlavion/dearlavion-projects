@@ -1,0 +1,91 @@
+# ====================
+# Frontend + Nginx (macOS)
+# ====================
+
+- name: Ensure Homebrew is installed
+  shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  args:
+    creates: /opt/homebrew/bin/brew
+  become: false
+
+- name: Ensure Node.js installed via Homebrew
+  homebrew:
+    name: node
+    state: present
+  become: false
+
+- name: Install Angular CLI globally
+  npm:
+    name: "@angular/cli"
+    global: yes
+  become: false
+
+- name: Install project dependencies
+  command: npm install
+  args:
+    chdir: "{{ ui_project_path }}"
+  become: false
+
+- name: Build Angular app (production)
+  command: npm run build -- --configuration production
+  args:
+    chdir: "{{ ui_project_path }}"
+  become: false
+
+- name: Ensure nginx installed via Homebrew
+  homebrew:
+    name: nginx
+    state: present
+  become: false
+
+# --- Directory setup for Nginx and Web Root ---
+- name: Ensure nginx servers directory exists
+  file:
+    path: /opt/homebrew/etc/nginx/servers
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Ensure nginx web root exists
+  file:
+    path: /opt/homebrew/var/www/dearlavion
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Ensure nginx log directory exists
+  file:
+    path: /opt/homebrew/var/log/nginx
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Ensure nginx run directory exists
+  file:
+    path: /opt/homebrew/var/run/nginx
+    state: directory
+    mode: '0755'
+  become: true
+
+# --- Deploy Angular build ---
+- name: Copy built UI to nginx folder
+  synchronize:
+    src: "{{ ui_project_path }}/dist/dearlavion-web-ui/"
+    dest: "/opt/homebrew/var/www/dearlavion/"
+    recursive: yes
+  become: false
+
+# --- Deploy Nginx configuration ---
+- name: Deploy nginx configuration
+  template:
+    src: "nginx-frontend.conf.j2"
+    dest: "/opt/homebrew/etc/nginx/servers/dearlavion.conf"
+  become: false
+
+- name: Test nginx configuration
+  command: nginx -t
+  become: true
+
+- name: Restart nginx
+  shell: brew services restart nginx
+  become: false

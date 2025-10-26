@@ -5,8 +5,10 @@ project_name: n8n
 #for ngrok server
 use_ngrok: true
 ngrok_auth_token: "30YMR2ia6phQ4XdQD73N9PAdFGw_7rwkaGMtMgGtzdt2cdcZX"
-ngrok_local_port: 5678
-ngrok_hostname: "my.dearlavion.site.ngrok.pizza"
+ngrok_local_port: 8080 #redirect to nginx
+#ngrok_local_port: 5678
+#ngrok_hostname: "my.dearlavion.site"   #configured dns in namecheap
+ngrok_hostname: "my.dearlavion.site.ngrok.pizza" #configured in ngrok hobby plan
 
 # Environment variables for your .env file
 env_vars:
