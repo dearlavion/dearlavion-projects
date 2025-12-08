@@ -17,21 +17,19 @@
   tags: ["start"]
 
 - name: Install Angular CLI globally
-  npm:
-    name: "@angular/cli"
-    global: yes
+  command: yarn global add @angular/cli
   become: false
   tags: ["start"]
 
 - name: Install project dependencies
-  command: npm install
+  command: yarn install
   args:
     chdir: "{{ ui_project_path }}"
   become: false
   tags: ["start"]
 
 - name: Build Angular app (production)
-  command: npm run build -- --configuration production
+  command: yarn run build -- --configuration production
   args:
     chdir: "{{ ui_project_path }}"
   become: false
@@ -83,7 +81,7 @@
     src: "{{ ui_project_path }}/dist/dearlavion-web-ui/"
     dest: "/opt/homebrew/var/www/dearlavion/"
     recursive: yes
-  become: false
+  become: true
   tags: ["start"]
 
 # --- Deploy Nginx configuration ---
