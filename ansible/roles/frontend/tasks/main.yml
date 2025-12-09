@@ -124,3 +124,8 @@
   shell: brew services stop nginx
   become: false
   tags: ["stop"]
+
+- name: Stop any nginx processes
+  shell: pkill nginx || true
+  become: false
+  tags: ["stop"]
