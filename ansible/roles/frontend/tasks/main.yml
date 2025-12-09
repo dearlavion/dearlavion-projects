@@ -43,11 +43,14 @@
   tags: ["start"]
 
 # --- Directory setup for Nginx and Web Root ---
-- name: Ensure nginx servers directory exists
+- name: Ensure nginx run directory exists
   file:
-    path: /opt/homebrew/etc/nginx/servers
+    path: /opt/homebrew/var/run/nginx
     state: directory
     mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: admin
+    recurse: yes
   become: true
   tags: ["start"]
 
@@ -56,6 +59,9 @@
     path: /opt/homebrew/var/www/dearlavion
     state: directory
     mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: admin
+    recurse: yes
   become: true
   tags: ["start"]
 
@@ -64,14 +70,9 @@
     path: /opt/homebrew/var/log/nginx
     state: directory
     mode: '0755'
-  become: true
-  tags: ["start"]
-
-- name: Ensure nginx run directory exists
-  file:
-    path: /opt/homebrew/var/run/nginx
-    state: directory
-    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: admin
+    recurse: yes
   become: true
   tags: ["start"]
 
@@ -97,11 +98,28 @@
   become: true
   tags: ["start"]
 
-- name: Restart nginx
-  shell: brew services restart nginx
+# --- Start/restart nginx safely ---
+- name: Stop nginx service if running
+  shell: brew services stop nginx || true
   become: false
   tags: ["start"]
 
+- name: Ensure nginx.pid is owned by the current user
+  file:
+    path: /opt/homebrew/var/run/nginx/nginx.pid
+    owner: "{{ ansible_user }}"
+    group: admin
+    state: file
+  become: true
+  tags: ["start"]
+  ignore_errors: yes  # in case PID doesn't exist yet
+
+- name: Start nginx manually
+  shell: nginx -c /opt/homebrew/etc/nginx/nginx.conf
+  become: false
+  tags: ["start"]
+
+# --- Stop nginx service ---
 - name: Stop nginx service
   shell: brew services stop nginx
   become: false
