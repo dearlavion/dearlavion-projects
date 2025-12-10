@@ -76,6 +76,15 @@
   become: true
   tags: ["start"]
 
+# --- Clean Nginx web root before deploying new build ---
+- name: Remove all existing files from Nginx web root
+  file:
+    path: "/opt/homebrew/var/www/dearlavion/*"
+    state: absent
+  become: true
+  tags: ["start"]
+  ignore_errors: yes
+
 # --- Deploy Angular build ---
 - name: Copy built UI to nginx folder
   synchronize:
