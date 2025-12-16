@@ -92,7 +92,7 @@ Run the script:
 
 
 Follow prompts:
-    
+
     ```bash
     Enter project names (comma-separated):
     Enter project names (comma-separated, e.g. dearlavion-app,myapp): dearlavion-app
@@ -116,6 +116,23 @@ dearlavion-app/
 Ansible files under ansible/ are updated automatically.
 
 # 🚀 Deployment Workflow
+```plaintext
+   ┌─────────────┐
+   │   NGINX     │  :80
+   │  (reverse)  │
+   └──────┬──────┘
+          │
+    ┌─────┴──────────────┐
+    │                    │
+    │  Angular (static)  │
+    │                    │
+    └────────┬───────────┘
+             │
+    ┌──────┴──────┐   ┌──────┴─────┐
+    │ Spring API  │   │ Spring API │
+    │   service1  │   │  service2  │
+    └─────────────┘   └────────────┘
+```
 
 Dev Environment – Auto-build & run on local:
 
