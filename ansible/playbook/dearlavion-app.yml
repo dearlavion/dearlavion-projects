@@ -1,0 +1,9 @@
+---
+- name: Setup dearlavion-app environment
+  hosts: dearlavion-app_local  # or dearlavion-app_prod
+  become: true
+
+  roles:
+    - dearlavion-app
+    - { role: ngrok, when: use_ngrok | default(false) }
+
