@@ -1,3 +1,4 @@
+---
 - name: Setup DearLavion App DEV environment (Ubuntu)
   hosts: dearlavion-app_dev
   become: true
@@ -14,7 +15,7 @@
         update_cache: yes
 
     # ----------------------------
-    # Install Python3, pip3
+    # Install Python3 and pip3
     # ----------------------------
     - name: Ensure Python3 and pip3 are installed
       apt:
@@ -38,7 +39,7 @@
         append: yes
 
     # ----------------------------
-    # Install latest Docker Compose
+    # Install latest Docker Compose (v2)
     # ----------------------------
     - name: Install latest Docker Compose
       shell: |
@@ -59,7 +60,7 @@
     # ----------------------------
     # Install Node.js and npm (for Angular UI)
     # ----------------------------
-    - name: Ensure Node.js is installed
+    - name: Ensure Node.js prerequisites are installed
       apt:
         name:
           - curl
@@ -80,7 +81,7 @@
     # Build and deploy services
     # ----------------------------
     - name: Build and deploy Authentication Service
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_path }}"
         files:
           - "{{ app_path }}/{{ compose_file }}"
@@ -91,7 +92,7 @@
       when: deploy_service == "auth"
 
     - name: Build and deploy Core Service
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_path }}"
         files:
           - "{{ app_path }}/{{ compose_file }}"
@@ -102,7 +103,7 @@
       when: deploy_service == "core"
 
     - name: Build and deploy Web UI
-      docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ app_path }}"
         files:
           - "{{ app_path }}/{{ compose_file }}"

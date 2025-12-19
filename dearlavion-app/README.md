@@ -17,20 +17,20 @@ dearlavion-projects/
 │   ├── docker-compose.dev.yml
 │   └── docker-compose.prod.yml
 └── ansible/
-├── inventory/
-│   └── hosts.ini
-├── playbook/
-│   └── dearlavion-app.yml
-├── group_vars/
-|   ├── dearlavion_local.yml
-│   ├── dearlavion_dev.yml
-│   └── dearlavion_prod.yml
-├── roles/
-│   └── dearlavion/
-│       └── tasks/
-│           └── main.yml
-└── templates/
-└── env.j2
+    ├── inventory/
+    │   └── hosts.ini
+    ├── playbook/
+    │   └── dearlavion-app.yml
+    ├── group_vars/
+    |   ├── dearlavion_local.yml
+    │   ├── dearlavion_dev.yml
+    │   └── dearlavion_prod.yml
+    ├── roles/
+    │   └── dearlavion/
+    │       └── tasks/
+    │           └── main.yml
+    └── templates/
+    └── env.j2
 ```
 
 # ⚙️ Purpose
