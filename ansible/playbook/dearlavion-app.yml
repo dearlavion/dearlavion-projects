@@ -3,7 +3,6 @@
   hosts: dearlavion-app_dev
   become: true                     # use sudo for tasks
   gather_facts: yes                # still gather facts
-  gather_facts_become: false       # do NOT use sudo when gathering facts
   vars_files:
     - ../group_vars/dearlavion_dev.yml   # loads use_ngrok, compose_file, app_path, service names
 
@@ -21,6 +20,7 @@
     # Update apt cache
     # ----------------------------
     - name: Update apt cache
+      become: true
       apt:
         update_cache: yes
 
