@@ -1,7 +1,7 @@
 # General environment settings
 use_ngrok: false
 compose_file: docker-compose.dev.yml
-app_path: /home/baish/dearlavion-projects/dearlavion-app  # Absolute path on DEV server
+app_path: /home/baish/dearlavion-projects  # Absolute path on DEV server
 
 # Optional: Docker Compose service names
 auth_service: dearlavion-authentication-service
