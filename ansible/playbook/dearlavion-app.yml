@@ -100,7 +100,7 @@
     - name: Ensure app base directory exists
       become: true
       file:
-        path: "{{ app_path }}"
+        path: "{{ project_path }}"
         state: directory
         owner: baish
         group: baish
@@ -109,7 +109,7 @@
     - name: Clone DearLavion app repository
       git:
         repo: git@github.com:dearlavion/dearlavion-projects.git
-        dest: "{{ app_path }}"
+        dest: "{{ project_path }}"
         version: "main"
         accept_hostkey: yes
         update: yes
