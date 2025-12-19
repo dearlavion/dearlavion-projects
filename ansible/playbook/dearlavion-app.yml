@@ -1,17 +1,18 @@
----
 - name: Setup DearLavion App DEV environment (Ubuntu)
   hosts: dearlavion-app_dev
-  become: false                     # use sudo for tasks
-  gather_facts: yes                # still gather facts
+  become: false
+  gather_facts: yes
 
   tasks:
+    # ----------------------------
+    # Load env-specific variables
+    # ----------------------------
     - name: Load environment-specific variables
       include_vars:
         file: "../group_vars/dearlavion-app_{{ env }}.yml"
+
     # ----------------------------
-    # In server:
-    # $ sudo visudo
-    # manually add on last line of file: baish ALL=(ALL) NOPASSWD:ALL
+    # Passwordless sudo (one-time)
     # ----------------------------
     - name: Ensure baish has passwordless sudo
       become: true
@@ -23,42 +24,39 @@
         validate: '/usr/sbin/visudo -cf %s'
 
     # ----------------------------
-    # Update apt cache
+    # System packages
     # ----------------------------
     - name: Update apt cache
       become: true
       apt:
         update_cache: yes
 
-    # ----------------------------
-    # Install Python3 and pip3
-    # ----------------------------
     - name: Ensure Python3 and pip3 are installed
+      become: true
       apt:
         name:
           - python3
           - python3-pip
         state: present
-      become: true
 
     # ----------------------------
-    # Install Docker
+    # Docker
     # ----------------------------
     - name: Ensure Docker is installed
+      become: true
       apt:
         name: docker.io
         state: present
-      become: true
 
     - name: Add user to docker group
+      become: true
       user:
-        name: "{{ ansible_user | default('baish') }}"
+        name: baish
         groups: docker
         append: yes
-      become: true
 
     # ----------------------------
-    # Install Docker Compose CLI plugin (v2)
+    # Docker Compose v2 (CLI plugin)
     # ----------------------------
     - name: Install Docker Compose CLI plugin (v2)
       become: true
@@ -67,47 +65,63 @@
         curl -SL https://github.com/docker/compose/releases/download/v2.24.2/docker-compose-linux-x86_64 \
           -o /usr/local/lib/docker/cli-plugins/docker-compose
         chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+      args:
+        creates: /usr/local/lib/docker/cli-plugins/docker-compose
 
     # ----------------------------
-    # Install Maven (for Java backend)
+    # Java + Node
     # ----------------------------
     - name: Ensure Maven is installed
+      become: true
       apt:
         name: maven
         state: present
-      become: true
 
-    # ----------------------------
-    # Install Node.js and npm (for Angular UI)
-    # ----------------------------
     - name: Ensure Node.js prerequisites are installed
+      become: true
       apt:
         name:
           - curl
           - gnupg
         state: present
-      become: true
 
     - name: Add NodeSource Node.js 20.x repository
+      become: true
       shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
       args:
         creates: /etc/apt/sources.list.d/nodesource.list
-      become: true
 
     - name: Install Node.js
+      become: true
       apt:
         name: nodejs
         state: present
+
+    - name: Ensure app base directory exists
       become: true
+      file:
+        path: "{{ app_path }}"
+        state: directory
+        owner: baish
+        group: baish
+        mode: '0755'
+
+    - name: Clone DearLavion app repository
+      become: false
+      git:
+        repo: https://github.com/dearlavion/dearlavion-app.git
+        dest: "{{ app_path }}"
+        version: main
+        force: yes
 
     # ----------------------------
-    # Build and deploy services
+    # Build & deploy services
     # ----------------------------
     - name: Build and deploy Authentication Service
       community.docker.docker_compose_v2:
         project_src: "{{ app_path }}"
         files:
-          - "{{ app_path }}/{{ compose_file }}"
+          - "{{ compose_file }}"
         services:
           - "{{ auth_service }}"
         build: always
@@ -118,7 +132,7 @@
       community.docker.docker_compose_v2:
         project_src: "{{ app_path }}"
         files:
-          - "{{ app_path }}/{{ compose_file }}"
+          - "{{ compose_file }}"
         services:
           - "{{ core_service }}"
         build: always
@@ -129,7 +143,7 @@
       community.docker.docker_compose_v2:
         project_src: "{{ app_path }}"
         files:
-          - "{{ app_path }}/{{ compose_file }}"
+          - "{{ compose_file }}"
         services:
           - "{{ web_ui_service }}"
         build: always
@@ -137,7 +151,7 @@
       when: deploy_service == "web-ui"
 
     # ----------------------------
-    # Run ngrok role if enabled
+    # Optional ngrok
     # ----------------------------
     - name: Run ngrok role if enabled
       include_role:
