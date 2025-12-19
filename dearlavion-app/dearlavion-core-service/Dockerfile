@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM openjdk:17-jdk-slim AS build
+FROM openjdk:21-jdk-slim AS build
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml first to leverage caching
@@ -15,7 +15,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Runtime
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 # Copy the built JAR from build stage
