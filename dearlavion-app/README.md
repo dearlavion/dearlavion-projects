@@ -4,33 +4,28 @@ This repository contains all projects managed with Docker + Ansible, including t
 ```plaintext
 📁 Project Structure
 dearlavion-projects/
-├── n8n/
-│   └── docker-compose.yml
 ├── dearlavion-app/
-│   ├── backend-service-1/
+│   ├── dearlavion-authentication-service/
 │   │   └── Dockerfile
-│   ├── backend-service-2/
+│   ├── dearlavion-core-service/
 │   │   └── Dockerfile
-│   ├── frontend/
+│   ├── dearlavion-web-ui/
 │   │   └── Dockerfile
 │   ├── nginx/
 │   │   └── nginx.conf
+|   ├── docker-compose.local.yml
 │   ├── docker-compose.dev.yml
 │   └── docker-compose.prod.yml
 └── ansible/
 ├── inventory/
 │   └── hosts.ini
 ├── playbook/
-│   ├── n8n.yml
-│   ├── dearlavion-dev.yml
-│   └── dearlavion-prod.yml
+│   └── dearlavion-app.yml
 ├── group_vars/
+|   ├── dearlavion_local.yml
 │   ├── dearlavion_dev.yml
 │   └── dearlavion_prod.yml
 ├── roles/
-│   ├── docker/
-│   ├── ngrok/
-│   ├── n8n/
 │   └── dearlavion/
 │       └── tasks/
 │           └── main.yml
@@ -44,11 +39,11 @@ n8n/ – Standalone workflow automation service, deployed with Docker Compose.
 
 dearlavion-app/ – Multi-service application containing:
 
-backend-service-1
+dearlavion-authentication-service
 
-backend-service-2
+dearlavion-core-service
 
-frontend
+dearlavion-web-ui (Angular 20)
 
 nginx
 Supports dev and prod Docker Compose environments.

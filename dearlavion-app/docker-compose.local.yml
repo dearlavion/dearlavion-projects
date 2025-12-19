@@ -2,27 +2,21 @@ version: "3.9"
 
 services:
   dearlavion-authentication-service:
-    build:
-      context: ./dearlavion-authentication-service
-    container_name: dearlavion-authentication-service
+    build: ./dearlavion-authentication-service
     ports:
       - "8081:8080"
     networks:
       - dearlavion-net
 
   dearlavion-core-service:
-    build:
-      context: ./dearlavion-core-service
-    container_name: dearlavion-core-service
+    build: ./dearlavion-core-service
     ports:
       - "8082:8080"
     networks:
       - dearlavion-net
 
   dearlavion-web-ui:
-    build:
-      context: ./dearlavion-web-ui
-    container_name: dearlavion-web-ui
+    build: ./dearlavion-web-ui
     networks:
       - dearlavion-net
     depends_on:
@@ -31,7 +25,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: dearlavion-nginx
     ports:
       - "8080:80"
     volumes:
