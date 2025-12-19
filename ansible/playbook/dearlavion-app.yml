@@ -3,10 +3,11 @@
   hosts: dearlavion-app_dev
   become: false                     # use sudo for tasks
   gather_facts: yes                # still gather facts
-  vars_files:
-    - ../group_vars/dearlavion_dev.yml   # loads use_ngrok, compose_file, app_path, service names
 
   tasks:
+    - name: Load environment-specific variables
+      include_vars:
+        file: "../group_vars/dearlavion-app_{{ env }}.yml"
     # ----------------------------
     # In server:
     # $ sudo visudo
