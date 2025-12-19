@@ -107,12 +107,13 @@
         mode: '0755'
 
     - name: Clone DearLavion app repository
-      become: false
       git:
-        repo: https://github.com/dearlavion/dearlavion-app.git
+        repo: git@github.com:dearlavion/dearlavion-app.git
         dest: "{{ app_path }}"
-        version: main
-        force: yes
+        version: "main"
+        accept_hostkey: yes
+        update: yes
+      become: false
 
     # ----------------------------
     # Build & deploy services
