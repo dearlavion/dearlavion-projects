@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM openjdk:21-jdk AS build
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml first to leverage caching
