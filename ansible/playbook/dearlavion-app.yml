@@ -7,12 +7,15 @@
   tasks:
 
     # ----------------------------
-    # Update apt and install prerequisites
+    # Update apt cache
     # ----------------------------
     - name: Update apt cache
       apt:
         update_cache: yes
 
+    # ----------------------------
+    # Install Python3, pip3
+    # ----------------------------
     - name: Ensure Python3 and pip3 are installed
       apt:
         name:
@@ -21,7 +24,7 @@
         state: present
 
     # ----------------------------
-    # Ensure Docker is installed
+    # Install Docker
     # ----------------------------
     - name: Ensure Docker is installed
       apt:
@@ -35,7 +38,7 @@
         append: yes
 
     # ----------------------------
-    # Ensure latest Docker Compose is installed
+    # Install latest Docker Compose
     # ----------------------------
     - name: Install latest Docker Compose
       shell: |
@@ -44,6 +47,34 @@
         chmod +x /usr/local/bin/docker-compose
       args:
         creates: /usr/local/bin/docker-compose
+
+    # ----------------------------
+    # Install Maven (for Java backend)
+    # ----------------------------
+    - name: Ensure Maven is installed
+      apt:
+        name: maven
+        state: present
+
+    # ----------------------------
+    # Install Node.js and npm (for Angular UI)
+    # ----------------------------
+    - name: Ensure Node.js is installed
+      apt:
+        name:
+          - curl
+          - gnupg
+        state: present
+
+    - name: Add NodeSource Node.js 20.x repository
+      shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      args:
+        creates: /etc/apt/sources.list.d/nodesource.list
+
+    - name: Install Node.js
+      apt:
+        name: nodejs
+        state: present
 
     # ----------------------------
     # Build and deploy services
