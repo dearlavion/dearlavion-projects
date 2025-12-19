@@ -108,7 +108,7 @@
 
     - name: Clone DearLavion app repository
       git:
-        repo: git@github.com:dearlavion/dearlavion-app.git
+        repo: git@github.com:dearlavion/dearlavion-projects.git
         dest: "{{ app_path }}"
         version: "main"
         accept_hostkey: yes
