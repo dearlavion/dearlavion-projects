@@ -7,6 +7,11 @@
     - ../group_vars/dearlavion_dev.yml   # loads use_ngrok, compose_file, app_path, service names
 
   tasks:
+    # ----------------------------
+    # In server:
+    # $ sudo visudo
+    # manually add on last line of file: baish ALL=(ALL) NOPASSWD:ALL
+    # ----------------------------
     - name: Ensure baish has passwordless sudo
       become: true
       ansible.builtin.lineinfile:
@@ -33,6 +38,7 @@
           - python3
           - python3-pip
         state: present
+      become: true
 
     # ----------------------------
     # Install Docker
@@ -41,12 +47,14 @@
       apt:
         name: docker.io
         state: present
+      become: true
 
     - name: Add user to docker group
       user:
         name: "{{ ansible_user | default('baish') }}"
         groups: docker
         append: yes
+      become: true
 
     # ----------------------------
     # Install latest Docker Compose (v2)
@@ -58,6 +66,7 @@
         chmod +x /usr/local/bin/docker-compose
       args:
         creates: /usr/local/bin/docker-compose
+      become: true
 
     # ----------------------------
     # Install Maven (for Java backend)
@@ -66,6 +75,7 @@
       apt:
         name: maven
         state: present
+      become: true
 
     # ----------------------------
     # Install Node.js and npm (for Angular UI)
@@ -76,16 +86,19 @@
           - curl
           - gnupg
         state: present
+      become: true
 
     - name: Add NodeSource Node.js 20.x repository
       shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
       args:
         creates: /etc/apt/sources.list.d/nodesource.list
+      become: true
 
     - name: Install Node.js
       apt:
         name: nodejs
         state: present
+      become: true
 
     # ----------------------------
     # Build and deploy services
