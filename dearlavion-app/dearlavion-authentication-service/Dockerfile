@@ -10,7 +10,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Runtime
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=build /app/target/dearlavion-authentication-service.jar ./dearlavion-authentication-service.jar
 CMD ["java", "-jar", "dearlavion-authentication-service.jar"]
