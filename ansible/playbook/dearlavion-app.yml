@@ -6,6 +6,14 @@
     - ../group_vars/dearlavion_dev.yml   # loads use_ngrok, compose_file, app_path, service names
 
   tasks:
+    - name: Ensure baish has passwordless sudo
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^baish ALL=.*NOPASSWD:ALL'
+        line: 'baish ALL=(ALL) NOPASSWD:ALL'
+        validate: '/usr/sbin/visudo -cf %s'
 
     # ----------------------------
     # Update apt cache
