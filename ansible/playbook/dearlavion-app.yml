@@ -117,14 +117,16 @@
           - "8082:8080"
       when: deploy_service == "core" and (use_registry | bool)
 
-    - name: Pull and run Web UI (Static)
+    - name: Pull and run Web UI
       community.docker.docker_container:
         name: dearlavion-web-ui
         image: ghcr.io/dearlavion/dearlavion-web-ui:dev
         state: started
         restart_policy: always
         ports:
-          - "80:80"
+          - "4200:80"   # <-- map host 4200 to container 80
+        networks:
+          - name: dearlavion-net
       when: deploy_service == "web-ui" and (use_registry | bool)
 
 
@@ -134,6 +136,7 @@
     - name: Deploy nginx reverse proxy
       include_role:
         name: ../roles/nginx
+      when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
     # Optional ngrok
