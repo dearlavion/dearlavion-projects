@@ -108,15 +108,16 @@
           - name: dearlavion-net
       when: deploy_service == "core" and (use_registry | bool)
 
-    - name: Pull and run Web UI
+    - name: Pull and run Web UI (Static)
       community.docker.docker_container:
         name: dearlavion-web-ui
         image: ghcr.io/dearlavion/dearlavion-web-ui:dev
         state: started
         restart_policy: always
-        networks:
-          - name: dearlavion-net
+        ports:
+          - "80:80"
       when: deploy_service == "web-ui" and (use_registry | bool)
+
 
     # ----------------------------
     # Deploy nginx role
