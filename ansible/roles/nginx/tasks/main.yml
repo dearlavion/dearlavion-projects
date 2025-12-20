@@ -1,32 +1,38 @@
-- name: Install nginx
-  become: true
-  apt:
-    name: nginx
-    state: present
-    update_cache: yes
-
-- name: Deploy nginx config
-  become: true
-  template:
-    src: dearlavion-app.conf.j2
-    dest: /etc/nginx/sites-available/dearlavion-app.conf
-
-- name: Enable nginx site
-  become: true
-  file:
-    src: /etc/nginx/sites-available/dearlavion-app.conf
-    dest: /etc/nginx/sites-enabled/dearlavion-app.conf
-    state: link
-    force: yes
-
-- name: Remove default nginx site
-  become: true
-  file:
-    path: /etc/nginx/sites-enabled/default
-    state: absent
-
-- name: Restart nginx
+- name: Stop host nginx if running
   become: true
   service:
     name: nginx
-    state: restarted
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Ensure project directories exist
+  become: true
+  file:
+    path: /opt/dearlavion/nginx
+    state: directory
+    mode: "0755"
+
+- name: Copy nginx.conf
+  become: true
+  copy:
+    src: nginx/nginx.conf
+    dest: /opt/dearlavion/nginx/nginx.conf
+
+- name: Deploy site config
+  become: true
+  template:
+    src: nginx/dearlavion-app.conf.j2
+    dest: /opt/dearlavion/nginx/dearlavion-app.conf
+
+- name: Deploy docker-compose file
+  become: true
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/dearlavion/docker-compose.yml
+
+- name: Start Docker stack
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /opt/dearlavion
+    state: present
