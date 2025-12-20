@@ -12,7 +12,7 @@
         file: "../group_vars/dearlavion-app_{{ env }}.yml"
 
     # ----------------------------
-    # Passwordless sudo (one-time)
+    # Passwordless sudo
     # ----------------------------
     - name: Ensure baish has passwordless sudo
       become: true
@@ -56,7 +56,7 @@
         append: yes
 
     # ----------------------------
-    # Docker Compose v2 (CLI plugin)
+    # Docker Compose v2
     # ----------------------------
     - name: Install Docker Compose CLI plugin (v2)
       become: true
@@ -69,87 +69,35 @@
         creates: /usr/local/lib/docker/cli-plugins/docker-compose
 
     # ----------------------------
-    # Java + Node
+    # Pull & run services from GHCR
     # ----------------------------
-    - name: Ensure Maven is installed
-      become: true
-      apt:
-        name: maven
-        state: present
+    - name: Pull and run Authentication Service
+      community.docker.docker_container:
+        name: dearlavion-authentication-service
+        image: ghcr.io/dearlavion/dearlavion-auth-service:dev
+        state: started
+        restart_policy: always
+        ports:
+          - "8081:8080"
+      when: deploy_service == "auth" and use_registry | default(false)
 
-    - name: Ensure Node.js prerequisites are installed
-      become: true
-      apt:
-        name:
-          - curl
-          - gnupg
-        state: present
+    - name: Pull and run Core Service
+      community.docker.docker_container:
+        name: dearlavion-core-service
+        image: ghcr.io/dearlavion/dearlavion-core-service:dev
+        state: started
+        restart_policy: always
+        ports:
+          - "8082:8080"
+      when: deploy_service == "core" and use_registry | default(false)
 
-    - name: Add NodeSource Node.js 20.x repository
-      become: true
-      shell: curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-      args:
-        creates: /etc/apt/sources.list.d/nodesource.list
-
-    - name: Install Node.js
-      become: true
-      apt:
-        name: nodejs
-        state: present
-
-    - name: Ensure app base directory exists
-      become: true
-      file:
-        path: "{{ project_path }}"
-        state: directory
-        owner: baish
-        group: baish
-        mode: '0755'
-
-    - name: Clone DearLavion app repository
-      git:
-        repo: git@github.com:dearlavion/dearlavion-projects.git
-        dest: "{{ project_path }}"
-        version: "main"
-        accept_hostkey: yes
-        update: yes
-      become: false
-
-    # ----------------------------
-    # Build & deploy services
-    # ----------------------------
-    - name: Build and deploy Authentication Service
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_path }}"
-        files:
-          - "{{ compose_file }}"
-        services:
-          - "{{ auth_service }}"
-        build: always
-        state: present
-      when: deploy_service == "auth"
-
-    - name: Build and deploy Core Service
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_path }}"
-        files:
-          - "{{ compose_file }}"
-        services:
-          - "{{ core_service }}"
-        build: always
-        state: present
-      when: deploy_service == "core"
-
-    - name: Build and deploy Web UI
-      community.docker.docker_compose_v2:
-        project_src: "{{ app_path }}"
-        files:
-          - "{{ compose_file }}"
-        services:
-          - "{{ web_ui_service }}"
-        build: always
-        state: present
-      when: deploy_service == "web-ui"
+    - name: Pull and run Web UI
+      community.docker.docker_container:
+        name: dearlavion-web-ui
+        image: ghcr.io/dearlavion/dearlavion-web-ui:dev
+        state: started
+        restart_policy: always
+      when: deploy_service == "web-ui" and use_registry | default(false)
 
     # ----------------------------
     # Optional ngrok
