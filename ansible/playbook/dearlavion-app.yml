@@ -124,7 +124,7 @@
     # ----------------------------
     - name: Deploy nginx reverse proxy
       include_role:
-        name: nginx
+        name: ../roles/nginx
 
     # ----------------------------
     # Optional ngrok
