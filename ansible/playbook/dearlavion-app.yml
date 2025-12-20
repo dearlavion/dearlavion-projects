@@ -2,7 +2,6 @@
   hosts: dearlavion-app_{{ env }}
   become: false
   gather_facts: yes
-  roles_path: ../roles
 
   tasks:
     # ----------------------------
