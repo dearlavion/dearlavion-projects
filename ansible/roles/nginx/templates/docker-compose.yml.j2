@@ -11,8 +11,6 @@ services:
       - ./nginx/dearlavion-app.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - web-ui
-      - auth
-      - core
     networks:
       - dearlavion-net
 
