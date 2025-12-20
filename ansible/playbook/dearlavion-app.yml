@@ -1,5 +1,5 @@
 - name: Setup DearLavion App DEV environment (Ubuntu)
-  hosts: dearlavion-app_dev
+  hosts: dearlavion-app_{{ env }}
   become: false
   gather_facts: yes
 
@@ -68,7 +68,18 @@
       args:
         creates: /usr/local/lib/docker/cli-plugins/docker-compose
 
-    - name: Log in to GHCR on DEV server
+    # ----------------------------
+    # Docker network for inter-container communication
+    # ----------------------------
+    - name: Ensure Docker network exists
+      community.docker.docker_network:
+        name: dearlavion-net
+        state: present
+
+    # ----------------------------
+    # Log in to GHCR on DEV server
+    # ----------------------------
+    - name: Log in to GHCR
       community.docker.docker_login:
         registry_url: ghcr.io
         username: baish
@@ -83,8 +94,8 @@
         image: ghcr.io/dearlavion/dearlavion-auth-service:dev
         state: started
         restart_policy: always
-        ports:
-          - "8081:8080"
+        networks:
+          - name: dearlavion-net
       when: deploy_service == "auth" and (use_registry | bool)
 
     - name: Pull and run Core Service
@@ -93,8 +104,8 @@
         image: ghcr.io/dearlavion/dearlavion-core-service:dev
         state: started
         restart_policy: always
-        ports:
-          - "8082:8080"
+        networks:
+          - name: dearlavion-net
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
@@ -103,9 +114,16 @@
         image: ghcr.io/dearlavion/dearlavion-web-ui:dev
         state: started
         restart_policy: always
-        ports:
-          - "8080:80"
+        networks:
+          - name: dearlavion-net
       when: deploy_service == "web-ui" and (use_registry | bool)
+
+    # ----------------------------
+    # Deploy nginx role
+    # ----------------------------
+    - name: Deploy nginx reverse proxy
+      include_role:
+        name: nginx
 
     # ----------------------------
     # Optional ngrok
