@@ -85,7 +85,7 @@
         restart_policy: always
         ports:
           - "8081:8080"
-      when: deploy_service == "auth" and use_registry | default(false)
+      when: deploy_service == "auth" and (use_registry | bool)
 
     - name: Pull and run Core Service
       community.docker.docker_container:
@@ -95,7 +95,7 @@
         restart_policy: always
         ports:
           - "8082:8080"
-      when: deploy_service == "core" and use_registry | default(false)
+      when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
       community.docker.docker_container:
@@ -103,7 +103,7 @@
         image: ghcr.io/dearlavion/dearlavion-web-ui:dev
         state: started
         restart_policy: always
-      when: deploy_service == "web-ui" and use_registry | default(false)
+      when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
     # Optional ngrok
