@@ -2,6 +2,7 @@
   hosts: dearlavion-app_{{ env }}
   become: false
   gather_facts: yes
+  roles_path: ../roles
 
   tasks:
     # ----------------------------
@@ -124,12 +125,12 @@
     # ----------------------------
     - name: Deploy nginx reverse proxy
       include_role:
-        name: ../nginx
+        name: nginx
 
     # ----------------------------
     # Optional ngrok
     # ----------------------------
     - name: Run ngrok role if enabled
       include_role:
-        name: ../ngrok
+        name: ngrok
       when: use_ngrok | default(false)
