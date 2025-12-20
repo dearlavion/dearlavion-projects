@@ -77,5 +77,64 @@ This script sets up a ready-to-use Ansible + Docker project structure.
 
       ```bash
       ansible-playbook -i inventory.ini playbook.yml --limit n8n -vvv
+
+
+# 🛠️ Init Script
+
+The repository includes a project scaffolding script:
+
+init-multiple-projects.sh
+
+Features:
+
+Create multiple projects in one run.
+
+Supports custom subfolders per project.
+
+Generates:
+
+docker-compose.dev.yml, docker-compose.prod.yml, .env
+
+Ansible roles, playbooks, group_vars
+
+Inventory entries (_local and _prod)
+
+ansible/templates/env.j2 if missing
+
+# 🔹 Usage
+
+Navigate to the repository root:
+
+    ```bash
+    cd ~/dearlavion-projects
+
+
+Run the script:
+
+    ```bash
+    bash init-multiple-projects.sh
+
+
+Follow prompts:
+
+    ```bash
+    Enter project names (comma-separated):
+    Enter project names (comma-separated, e.g. dearlavion-app,myapp): dearlavion-app
+    Enter subfolders for each project (comma-separated):
+    Enter subfolders for dearlavion-app (comma-separated, e.g. backend-service-1,backend-service-2,frontend,nginx): backend-service-1,backend-service-2,frontend,nginx
+
+
+Script creates all directories, files, and Ansible scaffolding automatically.
+```plaintext
+🔹 Example After Running
+dearlavion-app/
+├── backend-service-1/
+├── backend-service-2/
+├── frontend/
+├── nginx/
+├── docker-compose.dev.yml
+├── docker-compose.prod.yml
+└── .env
+```
    
    

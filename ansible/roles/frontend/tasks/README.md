@@ -1,3 +1,15 @@
+```plaintext
+Browser
+|
+|  http://my.dearlavion.site.ngrok.pizza
+v
+NGINX (port 8080)
+├── /            → Angular frontend (static files)
+├── /auth/*      → Auth backend (Docker, port 8081)
+└── /core/*      → Core backend (Docker, port 8082)
+```
+
+
 NGINX
 Update config:
 sudo nano /opt/homebrew/etc/nginx/servers/dearlavion.conf

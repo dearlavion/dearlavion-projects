@@ -103,6 +103,8 @@
         image: ghcr.io/dearlavion/dearlavion-web-ui:dev
         state: started
         restart_policy: always
+        ports:
+          - "8080:80"
       when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
