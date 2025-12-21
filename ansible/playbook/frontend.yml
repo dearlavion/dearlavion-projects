@@ -9,8 +9,8 @@
     nginx_web_root: "/opt/homebrew/var/www/dearlavion/browser"
     nginx_conf_dir: "/opt/homebrew/etc/nginx/servers"
     n8n_port: 5678
-    core_port: 8081
-    auth_port: 8082
+    core_port: 8082
+    auth_port: 8081
     ansible_user: alysson
 
   roles:
