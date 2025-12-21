@@ -2,11 +2,6 @@
   hosts: dearlavion-app_{{ env }}
   become: false
   gather_facts: yes
-  vars:
-    server_name: localhost
-    web_ui_port: 80
-    auth_port: 8081
-    core_port: 8082
 
   tasks:
     # ----------------------------
@@ -103,7 +98,7 @@
         networks:
           - name: dearlavion-net
         ports:
-          - "8081:8081"  # Auth: host 8081 → container 8081
+          - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
       when: deploy_service == "auth" and (use_registry | bool)
 
     - name: Pull and run Core Service
@@ -116,7 +111,7 @@
         networks:
           - name: dearlavion-net
         ports:
-          - "8082:8082"  # Core: host 8082 → container 8082
+          - "{{ core_port }}:{{ core_port }}"  # Core: host 8082 → container 8082
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
@@ -138,6 +133,19 @@
       include_role:
         name: ../roles/nginx
       when: deploy_service == "web-ui" and (use_registry | bool)
+
+    # ----------------------------
+    # Optional: Redeploy nginx only
+    # ----------------------------
+    - name: Redeploy nginx if requested
+      become: true
+      community.docker.docker_compose_v2:
+        project_src: /opt/dearlavion
+        state: present
+        services:
+          - nginx
+        recreate: true       # ensures container is recreated with new config
+      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # Optional ngrok
