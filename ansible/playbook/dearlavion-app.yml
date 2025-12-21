@@ -97,7 +97,8 @@
       community.docker.docker_container:
         name: dearlavion-authentication-service
         image: ghcr.io/dearlavion/dearlavion-auth-service:dev
-        state: started
+        pull: yes            # <-- always pull the latest image
+        state: restarted     # <-- restart container even if it exists
         restart_policy: always
         networks:
           - name: dearlavion-net
@@ -109,7 +110,8 @@
       community.docker.docker_container:
         name: dearlavion-core-service
         image: ghcr.io/dearlavion/dearlavion-core-service:dev
-        state: started
+        pull: yes            # <-- always pull the latest image
+        state: restarted     # <-- restart container even if it exists
         restart_policy: always
         networks:
           - name: dearlavion-net
@@ -121,7 +123,8 @@
       community.docker.docker_container:
         name: dearlavion-web-ui
         image: ghcr.io/dearlavion/dearlavion-web-ui:dev
-        state: started
+        pull: yes            # <-- always pull the latest image
+        state: restarted     # <-- restart container even if it exists
         restart_policy: always
         networks:
           - name: dearlavion-net
