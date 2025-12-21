@@ -1,0 +1,109 @@
+name: Deploy DearLavion Services to DEV
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_service:
+        description: 'Service to deploy (auth, core, web-ui, nginx)'
+        required: true
+        default: web-ui
+      rebuild_nginx:
+        description: 'Rebuild nginx container?'
+        required: false
+        default: 'false'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_USER: baish
+      SSH_HOST: 157.173.97.37
+
+    steps:
+      # ----------------------------
+      # Checkout current repo (service)
+      # ----------------------------
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # ----------------------------
+      # Setup Docker Buildx
+      # ----------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ----------------------------
+      # Log in to GitHub Container Registry
+      # ----------------------------
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.DEARLAVION_PAT }}
+
+      # ----------------------------
+      # Build Docker image (skip nginx)
+      # ----------------------------
+      - name: Build Docker image
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ "${{ github.event.inputs.deploy_service }}" != "nginx" ]]; then
+            echo "Building and pushing image for service: ${{ github.event.inputs.deploy_service }}"
+            docker buildx build \
+              --platform linux/amd64 \
+              --push \
+              -t ghcr.io/dearlavion/dearlavion-${{ github.event.inputs.deploy_service }}-service:dev \
+              .
+          else
+            echo "Skipping Docker build for nginx"
+          fi
+
+      # ----------------------------
+      # Checkout Ansible repo
+      # ----------------------------
+      - name: Checkout Ansible repo
+        uses: actions/checkout@v4
+        with:
+          repository: dearlavion/dearlavion-projects
+          path: dearlavion-projects
+          token: ${{ secrets.DEARLAVION_PAT }}
+
+      # ----------------------------
+      # Install Ansible & Docker Python module
+      # ----------------------------
+      - name: Install Ansible & Docker module
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-venv
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --user ansible docker
+          export PATH=$HOME/.local/bin:$PATH
+
+      # ----------------------------
+      # Setup SSH
+      # ----------------------------
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+      # ----------------------------
+      # Deploy service via Ansible
+      # ----------------------------
+      - name: Deploy Service via Ansible
+        run: |
+          export PATH=$HOME/.local/bin:$PATH
+          ansible-playbook \
+            -i dearlavion-projects/ansible/inventory/hosts.ini \
+            dearlavion-projects/ansible/playbook/dearlavion-app.yml \
+            -e "deploy_service=${{ github.event.inputs.deploy_service }} \
+                env=dev \
+                ssh_user=$SSH_USER \
+                ssh_host=$SSH_HOST \
+                use_registry=true \
+                ghcr_pat=${{ secrets.DEARLAVION_PAT }} \
+                rebuild_nginx=${{ github.event.inputs.rebuild_nginx || 'false' }}"
+        shell: bash
