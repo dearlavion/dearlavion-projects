@@ -135,16 +135,22 @@
       when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
-    # Optional: Redeploy nginx only
+    # Redeploy nginx if requested
     # ----------------------------
-    - name: Redeploy nginx if requested
-      become: true
-      community.docker.docker_compose_v2:
-        project_src: /opt/dearlavion
-        state: present
-        services:
-          - nginx
-        recreate: always       # ensures container is recreated with new config
+    - name: Redeploy nginx (role + container)
+      block:
+        - name: Include nginx role
+          include_role:
+            name: ../roles/nginx
+
+        - name: Redeploy nginx container
+          become: true
+          community.docker.docker_compose_v2:
+            project_src: /opt/dearlavion
+            state: present
+            services:
+              - nginx
+            recreate: always
       when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
