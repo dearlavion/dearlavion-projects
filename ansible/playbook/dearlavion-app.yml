@@ -144,7 +144,7 @@
         state: present
         services:
           - nginx
-        recreate: true       # ensures container is recreated with new config
+        recreate: always       # ensures container is recreated with new config
       when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
