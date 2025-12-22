@@ -135,6 +135,14 @@
       when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
+    # 🔐 Renew SSL certificates (safe every run)
+    # ----------------------------
+    - name: Encrypt certificates if needed
+      become: true
+      command: certbot renew
+      notify: Reload nginx
+
+    # ----------------------------
     # Redeploy nginx if requested
     # ----------------------------
     - name: Redeploy nginx (role + container)

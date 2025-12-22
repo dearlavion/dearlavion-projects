@@ -3,6 +3,7 @@ use_ngrok: false
 compose_file: docker-compose.dev.yml
 project_path: /home/baish/dearlavion-projects  # Absolute path on DEV server
 app_path: "{{ project_path }}/dearlavion-app"
+email: "dearlavion@gmail.com"
 
 # Optional: Docker Compose service names
 auth_service: dearlavion-authentication-service

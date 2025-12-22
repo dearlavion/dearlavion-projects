@@ -25,6 +25,24 @@
     src: nginx/dearlavion-app.conf.j2
     dest: /opt/dearlavion/nginx/dearlavion-app.conf
 
+- name: Ensure certbot is installed
+  become: true
+  apt:
+    name: certbot
+    state: present
+    update_cache: true
+
+- name: Obtain SSL certificate from Let's Encrypt
+  become: true
+  command: >
+    certbot certonly --nginx
+    --non-interactive
+    --agree-tos
+    {% for domain in server_names %}-d {{ domain }} {% endfor %}
+    -m {{ email }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+
 - name: Deploy docker-compose file
   become: true
   template:
