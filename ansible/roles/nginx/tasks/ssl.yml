@@ -1,0 +1,40 @@
+# tasks/ssl.yml
+- name: Ensure Certbot is installed
+  become: true
+  apt:
+    name: certbot
+    state: present
+    update_cache: true
+
+- name: Ensure webroot exists for HTTP validation
+  become: true
+  file:
+    path: /opt/dearlavion/certbot-webroot
+    state: directory
+    mode: '0755'
+
+- name: Obtain SSL certificates from Let's Encrypt (only if missing)
+  become: true
+  command: >
+    certbot certonly --webroot
+    -w /opt/dearlavion/certbot-webroot
+    {% for domain in server_names %}-d {{ domain }} {% endfor %}
+    --non-interactive
+    --agree-tos
+    -m {{ email }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+  notify: Reload nginx
+
+- name: Renew certificates (safe every run)
+  become: true
+  command: certbot renew
+  notify: Reload nginx
+
+# -----------------------------
+# Handler to reload Nginx container
+# -----------------------------
+handlers:
+  - name: Reload nginx
+    become: true
+    command: docker exec dearlavion-nginx nginx -s reload
