@@ -191,7 +191,7 @@
             target: /etc/nginx/conf.d/default.conf
             mode: ro
         networks:
-          - dearlavion-net
+          - name: dearlavion-net
       when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
