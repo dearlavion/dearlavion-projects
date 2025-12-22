@@ -138,8 +138,12 @@
         ports:
           - "80:80"
         volumes:
-          "/opt/dearlavion/certbot-webroot":"/var/www/certbot:rw"
-          "/opt/dearlavion/nginx/temp-certbot.conf":"/etc/nginx/conf.d/default.conf:ro"
+          - source: /opt/dearlavion/certbot-webroot
+            target: /var/www/certbot
+            mode: rw
+          - source: /opt/dearlavion/nginx/temp-certbot.conf
+            target: /etc/nginx/conf.d/default.conf
+            mode: ro
         networks:
           - dearlavion-net
       when: rebuild_nginx | default(false) | bool
