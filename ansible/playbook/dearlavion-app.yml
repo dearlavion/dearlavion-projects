@@ -135,6 +135,22 @@
       when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
+    # Ensure Certbot is installed
+    # ----------------------------
+    - name: Check if certbot exists
+      ansible.builtin.command: which certbot
+      register: certbot_check
+      ignore_errors: true
+
+    - name: Install certbot if missing
+      become: true
+      apt:
+        name: certbot
+        state: present
+        update_cache: true
+      when: certbot_check.rc != 0
+
+    # ----------------------------
     # 🔐 Renew SSL certificates (safe every run)
     # ----------------------------
     - name: Encrypt certificates if needed
