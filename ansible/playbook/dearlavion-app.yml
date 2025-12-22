@@ -136,10 +136,10 @@
         state: started
         restart_policy: no
         ports:
-          - "80": "80"
+          - "80":"80"
         volumes:
-          "/opt/dearlavion/certbot-webroot": "/var/www/certbot:rw"
-          "/opt/dearlavion/nginx/temp-certbot.conf": "/etc/nginx/conf.d/default.conf:ro"
+          "/opt/dearlavion/certbot-webroot":"/var/www/certbot:rw"
+          "/opt/dearlavion/nginx/temp-certbot.conf":"/etc/nginx/conf.d/default.conf:ro"
         networks:
           - dearlavion-net
       when: rebuild_nginx | default(false) | bool
