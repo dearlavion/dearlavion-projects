@@ -2,19 +2,17 @@ server {
     listen 443 ssl;
     server_name {{ server_names | join(' ') }};
 
-    ssl_certificate /etc/ssl/certs/fullchain.pem;
-    ssl_certificate_key /etc/ssl/private/privkey.pem;
-
+    ssl_certificate /etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_names[0] }}/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
 
     # ======================
-    # Frontend (Angular)
+    # Frontend
     # ======================
     location / {
         proxy_pass http://dearlavion-web-ui:{{ web_ui_port }};
         proxy_http_version 1.1;
-
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -27,7 +25,6 @@ server {
     location /auth/ {
         proxy_pass http://dearlavion-authentication-service:{{ auth_port }};
         proxy_http_version 1.1;
-
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -40,10 +37,16 @@ server {
     location /core/ {
         proxy_pass http://dearlavion-core-service:{{ core_port }};
         proxy_http_version 1.1;
-
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+}
+
+# Optional: Redirect HTTP → HTTPS
+server {
+    listen 80;
+    server_name {{ server_names | join(' ') }};
+    return 301 https://$host$request_uri;
 }
