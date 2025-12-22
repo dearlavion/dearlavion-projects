@@ -1,0 +1,17 @@
+server {
+    listen 80;
+    server_name {% for domain in server_names %}{{ domain }} {% endfor %};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # Deny all other requests to this temporary server
+    location / {
+        return 404;
+    }
+
+    # Optional: logging
+    access_log /var/log/nginx/certbot_access.log;
+    error_log  /var/log/nginx/certbot_error.log;
+}
