@@ -14,4 +14,3 @@ auth_port: 8081
 core_port: 8082
 server_names:
   - dearlavion.site
-  - www.dearlavion.site
