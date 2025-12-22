@@ -43,10 +43,3 @@
   command: certbot renew
   notify: Reload nginx
 
-# -----------------------------
-# Handler to reload Nginx container
-# -----------------------------
-handlers:
-  - name: Reload nginx
-    become: true
-    command: docker exec dearlavion-nginx nginx -s reload

@@ -178,3 +178,8 @@
       include_role:
         name: ngrok
       when: use_ngrok | default(false)
+
+  handlers:
+    - name: Reload nginx
+      command: docker exec dearlavion-nginx nginx -s reload
+      become: true
