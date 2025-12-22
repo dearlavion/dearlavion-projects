@@ -13,7 +13,5 @@ web_ui_port: 80
 auth_port: 8081
 core_port: 8082
 server_names:
-  - localhost
-  - 127.0.0.1
   - dearlavion.site
   - www.dearlavion.site
