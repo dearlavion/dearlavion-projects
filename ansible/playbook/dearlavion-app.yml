@@ -168,6 +168,13 @@
         dest: /opt/dearlavion/nginx/temp-certbot.conf
       when: rebuild_nginx | default(false) | bool
 
+    - name: Remove temporary Nginx container
+      become: true
+      community.docker.docker_container:
+        name: dearlavion-nginx-temp
+        state: absent
+        force_kill: yes
+
     # ----------------------------
     # Deploy minimal Nginx for Certbot
     # ----------------------------
