@@ -136,12 +136,13 @@
         state: started
         restart_policy: no
         ports:
-          - "80:80"
+          - "80": "80"
         volumes:
-          - /opt/dearlavion/certbot-webroot:/var/www/certbot:rw
-          - ./nginx/temp-certbot.conf:/etc/nginx/conf.d/default.conf:ro
+          "/opt/dearlavion/certbot-webroot": "/var/www/certbot:rw"
+          "/opt/dearlavion/nginx/temp-certbot.conf": "/etc/nginx/conf.d/default.conf:ro"
         networks:
           - dearlavion-net
+      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # Ensure Certbot is installed
@@ -152,6 +153,7 @@
         name: certbot
         state: present
         update_cache: true
+      when: rebuild_nginx | default(false) | bool
 
     - name: Ensure webroot exists for ACME challenge
       become: true
@@ -161,6 +163,7 @@
         owner: root
         group: root
         mode: '0755'
+      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # 🔐 Renew SSL certificates (safe every run)
@@ -176,6 +179,7 @@
         -m {{ email }}
       args:
         creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # Remove temporary Nginx
@@ -186,18 +190,10 @@
         name: dearlavion-nginx-temp
         state: absent
         force_kill: yes
+      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
-    # Deploy full Nginx role
-    # ----------------------------
-    - name: Deploy nginx reverse proxy
-      include_role:
-        name: ../roles/nginx
-      when: deploy_service == "web-ui" and (use_registry | bool)
-
-
-    # ----------------------------
-    # Redeploy nginx if requested
+    # Redeploy nginx
     # ----------------------------
     - name: Redeploy nginx (role + container)
       block:
@@ -213,9 +209,8 @@
             services:
               - nginx
             recreate: always
+
+        - name: Reload nginx
+          command: docker exec dearlavion-nginx nginx -s reload
+          become: true
       when: rebuild_nginx | default(false) | bool
-
-    - name: Reload nginx
-      command: docker exec dearlavion-nginx nginx -s reload
-      become: true
-
