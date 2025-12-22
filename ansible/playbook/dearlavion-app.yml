@@ -165,7 +165,7 @@
       become: true
       community.docker.docker_container:
         name: dearlavion-nginx-temp
-        state: started
+        state: absent
         force_kill: yes
 
     - name: Render temporary Nginx template for Certbot
