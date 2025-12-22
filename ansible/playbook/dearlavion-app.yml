@@ -137,18 +137,12 @@
     # ----------------------------
     # Ensure Certbot is installed
     # ----------------------------
-    - name: Check if certbot exists
-      ansible.builtin.command: which certbot
-      register: certbot_check
-      ignore_errors: true
-
-    - name: Install certbot if missing
+    - name: Ensure certbot is installed
       become: true
       apt:
         name: certbot
         state: present
         update_cache: true
-      when: certbot_check.rc != 0
 
     # ----------------------------
     # 🔐 Renew SSL certificates (safe every run)
