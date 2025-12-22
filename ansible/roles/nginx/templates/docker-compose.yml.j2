@@ -11,7 +11,7 @@ services:
       - /etc/letsencrypt/live:/etc/letsencrypt/live:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:rw
       - /etc/letsencrypt/renewal:/etc/letsencrypt/renewal:rw
-      - /opt/dearlavion/certbot-webroot:/var/www/certbot:rw
+      - /opt/dearlavion/certbot-webroot:/var/www/certbot
     networks:
       - dearlavion-net
 

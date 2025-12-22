@@ -144,6 +144,15 @@
         state: present
         update_cache: true
 
+    - name: Ensure webroot exists for ACME challenge
+      become: true
+      file:
+        path: /opt/dearlavion/certbot-webroot
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
     # ----------------------------
     # 🔐 Renew SSL certificates (safe every run)
     # ----------------------------
