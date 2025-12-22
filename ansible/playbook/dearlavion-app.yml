@@ -164,7 +164,7 @@
     - name: Render temporary Nginx template for Certbot
       become: true
       template:
-        src: ../roles/nginx/templates/nginx/temp-certbot.conf.j2
+        src: ../roles/nginx/files/nginx/temp-certbot.conf
         dest: /opt/dearlavion/nginx/temp-certbot.conf
       when: rebuild_nginx | default(false) | bool
 
