@@ -167,7 +167,7 @@
     - name: Copy temporary Nginx template
       become: true
       copy:
-        src: nginx/templates/nginx/temp-certbot.conf.j2
+        src: ../roles/nginx/templates/nginx/temp-certbot.conf.j2
         dest: /opt/dearlavion/nginx/temp-certbot.conf.j2
       when: rebuild_nginx | default(false) | bool
 
