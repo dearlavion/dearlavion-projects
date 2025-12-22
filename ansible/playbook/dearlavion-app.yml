@@ -259,3 +259,23 @@
           command: docker exec dearlavion-nginx nginx -s reload
           become: true
       when: rebuild_nginx | default(false) | bool
+
+    # ----------------------------
+    # 🔐 Renew SSL certificates
+    # ----------------------------
+    - name: Renew Let's Encrypt certificates (if needed)
+      become: true
+      command: certbot renew
+      register: certbot_result
+      changed_when: "'Congratulations' in certbot_result.stdout"
+      when: renew_cert | default(false) | bool
+
+    # ----------------------------
+    # 🔄 Reload nginx if cert was renewed
+    # ----------------------------
+    - name: Reload nginx to apply renewed certificates
+      become: true
+      command: docker exec {{ nginx_container_name }} nginx -s reload
+      when:
+        - renew_cert | default(false) | bool
+        - certbot_result is changed
