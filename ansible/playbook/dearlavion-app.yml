@@ -97,6 +97,8 @@
         restart_policy: always
         networks:
           - name: dearlavion-net
+        env:
+          MONGO_URI: "mongodb+srv://admin:admin@dearlavioncluster.xnanadi.mongodb.net/authentication-service?retryWrites=true&w=majority&appName=DearLavionCluster"
         ports:
           - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
       when: deploy_service == "auth" and (use_registry | bool)
