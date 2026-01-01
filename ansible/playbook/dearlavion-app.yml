@@ -97,7 +97,7 @@
         restart_policy: always
         networks:
           - name: dearlavion-net
-        dns:
+        dns_servers:
           - 8.8.8.8
           - 1.1.1.1
         env:
