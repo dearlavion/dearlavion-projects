@@ -175,6 +175,12 @@
         dest: /opt/dearlavion/nginx/temp-certbot.conf
       when: rebuild_nginx | default(false) | bool
 
+    - name: Stop main Nginx temporarily
+      community.docker.docker_container:
+        name: dearlavion-nginx
+        state: stopped
+      when: rebuild_nginx | default(false) | bool
+
     # ----------------------------
     # Deploy minimal Nginx for Certbot
     # ----------------------------
