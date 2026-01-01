@@ -114,6 +114,8 @@
           - name: dearlavion-net
         ports:
           - "{{ core_port }}:{{ core_port }}"  # Core: host 8082 → container 8082
+        env:
+          MONGO_URI: "mongodb+srv://admin:admin@dearlavioncluster.xnanadi.mongodb.net/authentication-service?retryWrites=true&w=majority&appName=DearLavionCluster"
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
