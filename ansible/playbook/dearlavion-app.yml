@@ -92,6 +92,16 @@
       when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
+    # Reset nginx stack to clear old network IDs
+    # ----------------------------
+    - name: Tear down nginx stack to clear old network references
+      become: true
+      community.docker.docker_compose_v2:
+        project_src: /opt/dearlavion
+        state: absent
+      when: rebuild_nginx | default(false) | bool
+
+    # ----------------------------
     # Log in to GHCR on DEV server
     # ----------------------------
     - name: Log in to GHCR
