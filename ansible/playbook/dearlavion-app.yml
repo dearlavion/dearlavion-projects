@@ -101,7 +101,7 @@
           - 8.8.8.8
           - 1.1.1.1
         env:
-          MONGO_URI: "mongodb+srv://admin:admin@dearlavioncluster.xnanadi.mongodb.net/authentication-service?retryWrites=true&w=majority&appName=DearLavionCluster"
+          SPRING_DATA_MONGODB_URI: "mongodb+srv://admin:admin@dearlavioncluster.xnanadi.mongodb.net/authentication-service?retryWrites=true&w=majority&appName=DearLavionCluster"
           JAVA_OPTS: "-Djava.net.preferIPv4Stack=true"
         ports:
           - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
