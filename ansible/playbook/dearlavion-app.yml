@@ -71,13 +71,6 @@
     # ----------------------------
     # Network
     # ----------------------------
-    - name: Remove existing Docker network if it exists
-      community.docker.docker_network:
-        name: dearlavion-net
-        state: absent
-      ignore_errors: yes
-      when: rebuild_nginx | default(false) | bool
-
     - name: Create Docker network with proper subnet
       community.docker.docker_network:
         name: dearlavion-net

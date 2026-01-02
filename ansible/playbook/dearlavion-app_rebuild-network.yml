@@ -1,0 +1,117 @@
+- name: Rebuild DearLavion Docker network with services
+  hosts: dearlavion-app_{{ env }}
+  become: true
+  gather_facts: yes
+
+  vars:
+    network_name: dearlavion-net
+    services_to_restart:
+      - dearlavion-authentication-service
+      - dearlavion-core-service
+      - dearlavion-web-ui
+      - dearlavion-nginx
+
+  tasks:
+
+    # ----------------------------
+    # Stop all containers using the network
+    # ----------------------------
+    - name: Stop all containers if they exist
+      community.docker.docker_container_info:
+        name: "{{ item }}"
+      register: container_info
+      ignore_errors: yes
+      loop: "{{ services_to_restart }}"
+
+    - name: Stop container if it exists
+      community.docker.docker_container:
+        name: "{{ item.item }}"
+        state: stopped
+      when: item.exists | default(false)
+      loop: "{{ container_info.results }}"
+
+    # ----------------------------
+    # Remove old network
+    # ----------------------------
+    - name: Remove Docker network
+      community.docker.docker_network:
+        name: "{{ network_name }}"
+        state: absent
+      ignore_errors: yes
+
+    # ----------------------------
+    # Create new network
+    # ----------------------------
+    - name: Create Docker network
+      community.docker.docker_network:
+        name: "{{ network_name }}"
+        state: present
+        driver: bridge
+        driver_options:
+          com.docker.network.bridge.enable_ip_masquerade: "true"
+        ipam_config:
+          - subnet: 172.25.0.0/16
+            gateway: 172.25.0.1
+        attachable: yes
+
+    # ----------------------------
+    # Temporary Nginx for Certbot
+    # ----------------------------
+    - name: Ensure webroot exists for ACME challenge
+      file:
+        path: /opt/dearlavion/certbot-webroot
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Render temporary Nginx config for Certbot
+      template:
+        src: ../roles/nginx/files/nginx/temp-certbot.conf
+        dest: /opt/dearlavion/nginx/temp-certbot.conf
+
+    - name: Run temporary Nginx for Certbot
+      shell: |
+        docker rm -f dearlavion-nginx-temp || true
+        docker run -d \
+          --name dearlavion-nginx-temp \
+          -p 80:80 \
+          --network {{ network_name }} \
+          -v /opt/dearlavion/certbot-webroot:/var/www/certbot:rw \
+          -v /opt/dearlavion/nginx/temp-certbot.conf:/etc/nginx/conf.d/default.conf:ro \
+          nginx:1.25-alpine
+
+    - name: Obtain/renew SSL certificates
+      command: >
+        certbot certonly --webroot
+        -w /opt/dearlavion/certbot-webroot
+        {% for domain in server_names %}-d {{ domain }} {% endfor %}
+        --non-interactive
+        --agree-tos
+        -m {{ email }}
+      args:
+        creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+
+    - name: Remove temporary Nginx container
+      community.docker.docker_container:
+        name: dearlavion-nginx-temp
+        state: absent
+        force_kill: yes
+
+    # ----------------------------
+    # Start main services attached to new network
+    # ----------------------------
+    - name: Start main services
+      community.docker.docker_container:
+        name: "{{ item.name }}"
+        image: "{{ item.image }}"
+        state: started
+        restart_policy: always
+        networks:
+          - name: "{{ network_name }}"
+        ports: "{{ item.ports | default([]) }}"
+      loop:
+        - { name: "dearlavion-authentication-service", image: "ghcr.io/dearlavion/dearlavion-auth-service:dev", ports: ["8081:8081"] }
+        - { name: "dearlavion-core-service", image: "ghcr.io/dearlavion/dearlavion-core-service:dev", ports: ["8082:8082"] }
+        - { name: "dearlavion-web-ui", image: "ghcr.io/dearlavion/dearlavion-web-ui:dev" }
+        - { name: "dearlavion-nginx", image: "nginx:1.25-alpine", ports: ["80:80", "443:443"] }
