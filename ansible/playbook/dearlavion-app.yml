@@ -69,9 +69,16 @@
         creates: /usr/local/lib/docker/cli-plugins/docker-compose
 
     # ----------------------------
-    # Docker network for inter-container communication
+    # Network
     # ----------------------------
-    - name: Ensure Docker network exists with proper DNS
+    - name: Remove existing Docker network if it exists
+      community.docker.docker_network:
+        name: dearlavion-net
+        state: absent
+      ignore_errors: yes
+      when: rebuild_nginx | default(false) | bool
+
+    - name: Create Docker network with proper DNS
       community.docker.docker_network:
         name: dearlavion-net
         state: present
@@ -84,6 +91,7 @@
         dns:
           - 8.8.8.8
           - 1.1.1.1
+      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # Log in to GHCR on DEV server
