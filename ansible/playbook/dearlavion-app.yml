@@ -97,12 +97,9 @@
         restart_policy: always
         networks:
           - name: dearlavion-net
-        dns_servers:
-          - 8.8.8.8
-          - 1.1.1.1
         env:
           SPRING_DATA_MONGODB_URI: "mongodb+srv://admin:admin@dearlavioncluster.xnanadi.mongodb.net/authentication-service?retryWrites=true&w=majority&appName=DearLavionCluster"
-          JAVA_OPTS: "-Djava.net.preferIPv4Stack=true"
+          JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dsun.net.spi.nameservice.provider.1=dns,sun"
         ports:
           - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
       when: deploy_service == "auth" and (use_registry | bool)
