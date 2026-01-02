@@ -89,7 +89,6 @@
           - subnet: 172.25.0.0/16
             gateway: 172.25.0.1
         attachable: yes
-      when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # Reset nginx stack to clear old network IDs
@@ -232,26 +231,6 @@
           -v /opt/dearlavion/nginx/temp-certbot.conf:/etc/nginx/conf.d/default.conf:ro \
           nginx:1.25-alpine
       when: rebuild_nginx | default(false) | bool
-    #- name: Deploy temporary Nginx for ACME challenge
-    #  become: true
-    #  community.docker.docker_container:
-    #    name: dearlavion-nginx-temp
-    #    image: nginx:1.25-alpine
-    #    state: started
-    #    restart_policy: no
-    #    ports:
-    #      - "80:80"
-    #    volumes:
-    #      - source: /opt/dearlavion/certbot-webroot
-    #        target: /var/www/certbot
-    #        mode: rw
-    #      - source: /opt/dearlavion/nginx/temp-certbot.conf
-    #        target: /etc/nginx/conf.d/default.conf
-    #        mode: ro
-    #    recreate: yes
-    #    networks:
-    #      - name: dearlavion-net
-    #  when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
     # 🔐 Renew SSL certificates (safe every run)
