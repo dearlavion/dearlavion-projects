@@ -111,7 +111,7 @@
           - name: "{{ network_name }}"
         ports: "{{ item.ports | default([]) }}"
       loop:
-        - { name: "dearlavion-authentication-service", image: "ghcr.io/dearlavion/dearlavion-auth-service:dev", ports: ["8081:8081"] }
+        - { name: "dearlavion-authentication-service", image: "ghcr.io/dearlavion/dearlavion-authentication-service:dev", ports: ["8081:8081"] }
         - { name: "dearlavion-core-service", image: "ghcr.io/dearlavion/dearlavion-core-service:dev", ports: ["8082:8082"] }
         - { name: "dearlavion-web-ui", image: "ghcr.io/dearlavion/dearlavion-web-ui:dev" }
         - { name: "dearlavion-nginx", image: "nginx:1.25-alpine", ports: ["80:80", "443:443"] }

@@ -92,7 +92,7 @@ You should see your Angular app load.
 
 ## Debug if the image pulled is latest
 
-    docker images ghcr.io/dearlavion/dearlavion-auth-service:dev
+    docker images ghcr.io/dearlavion/dearlavion-authentication-service:dev
 
     REPOSITORY                                   TAG       IMAGE ID       CREATED          SIZE
-    ghcr.io/dearlavion/dearlavion-auth-service   dev       fae251ea4100   11 minutes ago   319MB
+    ghcr.io/dearlavion/dearlavion-authentication-service   dev       fae251ea4100   11 minutes ago   319MB

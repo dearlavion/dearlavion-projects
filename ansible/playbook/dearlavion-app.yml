@@ -108,7 +108,7 @@
     - name: Pull and run Authentication Service
       community.docker.docker_container:
         name: dearlavion-authentication-service
-        image: ghcr.io/dearlavion/dearlavion-auth-service:dev
+        image: ghcr.io/dearlavion/dearlavion-authentication-service:dev
         pull: yes            # <-- always pull the latest image
         state: started     # <-- restart container even if it exists
         restart_policy: always
