@@ -216,7 +216,7 @@
         state: stopped
       when:
         - rebuild_nginx | default(false) | bool
-        - nginx_info.containers | length > 0
+        - nginx_info.exists
 
     # ----------------------------
     # Deploy minimal Nginx for Certbot
