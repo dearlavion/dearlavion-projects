@@ -71,10 +71,19 @@
     # ----------------------------
     # Docker network for inter-container communication
     # ----------------------------
-    - name: Ensure Docker network exists
+    - name: Ensure Docker network exists with proper DNS
       community.docker.docker_network:
         name: dearlavion-net
         state: present
+        driver: bridge
+        options:
+          com.docker.network.bridge.enable_ip_masquerade: "true"
+        ipam_options:
+          subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
+        dns:
+          - 8.8.8.8
+          - 1.1.1.1
 
     # ----------------------------
     # Log in to GHCR on DEV server
@@ -115,8 +124,6 @@
           - name: dearlavion-net
         ports:
           - "{{ core_port }}:{{ core_port }}"  # Core: host 8082 → container 8082
-        env:
-          MONGO_URI: "mongodb+srv://admin:admin@dearlavioncluster.xnanadi.mongodb.net/authentication-service?retryWrites=true&w=majority&appName=DearLavionCluster"
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
