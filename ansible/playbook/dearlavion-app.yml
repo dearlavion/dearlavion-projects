@@ -78,19 +78,17 @@
       ignore_errors: yes
       when: rebuild_nginx | default(false) | bool
 
-    - name: Create Docker network with proper DNS
+    - name: Create Docker network with proper subnet
       community.docker.docker_network:
         name: dearlavion-net
         state: present
         driver: bridge
-        options:
+        driver_options:
           com.docker.network.bridge.enable_ip_masquerade: "true"
-        ipam_options:
-          subnet: 172.25.0.0/16
-          gateway: 172.25.0.1
-        dns:
-          - 8.8.8.8
-          - 1.1.1.1
+        ipam_config:
+          - subnet: 172.25.0.0/16
+            gateway: 172.25.0.1
+        attachable: yes
       when: rebuild_nginx | default(false) | bool
 
     # ----------------------------
