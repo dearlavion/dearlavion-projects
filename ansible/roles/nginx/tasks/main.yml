@@ -1,4 +1,6 @@
-# task/main.yml
+# ----------------------------
+# Stop host nginx if installed
+# ----------------------------
 - name: Stop host nginx if running
   become: true
   service:
@@ -7,6 +9,9 @@
     enabled: false
   ignore_errors: true
 
+# ----------------------------
+# Ensure project directories exist
+# ----------------------------
 - name: Ensure project directories exist
   become: true
   file:
@@ -14,6 +19,9 @@
     state: directory
     mode: "0755"
 
+# ----------------------------
+# Copy configs
+# ----------------------------
 - name: Copy nginx.conf
   become: true
   copy:
@@ -33,7 +41,7 @@
   include_tasks: ssl.yml
 
 # ----------------------------
-# Docker
+# Docker Compose
 # ----------------------------
 - name: Deploy docker-compose file
   become: true
@@ -41,8 +49,23 @@
     src: docker-compose.yml.j2
     dest: /opt/dearlavion/docker-compose.yml
 
+# ----------------------------
+# Start Docker stack
+# ----------------------------
 - name: Start Docker stack
   become: true
   community.docker.docker_compose_v2:
     project_src: /opt/dearlavion
     state: present
+
+# ----------------------------
+# Wait for nginx container to be running
+# ----------------------------
+- name: Wait for nginx container to be running
+  community.docker.docker_container_info:
+    name: dearlavion-nginx
+  register: nginx_info
+  until: nginx_info.container.State.Running
+  retries: 5
+  delay: 2
+  ignore_errors: false
