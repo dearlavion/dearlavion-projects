@@ -203,11 +203,20 @@
         dest: /opt/dearlavion/nginx/temp-certbot.conf
       when: rebuild_nginx | default(false) | bool
 
-    - name: Stop main Nginx temporarily
+    - name: Check if main Nginx container exists
+      community.docker.docker_container_info:
+        name: dearlavion-nginx
+      register: nginx_info
+      failed_when: false
+      when: rebuild_nginx | default(false) | bool
+
+    - name: Stop main Nginx temporarily (only if it exists)
       community.docker.docker_container:
         name: dearlavion-nginx
         state: stopped
-      when: rebuild_nginx | default(false) | bool
+      when:
+        - rebuild_nginx | default(false) | bool
+        - nginx_info.containers | length > 0
 
     # ----------------------------
     # Deploy minimal Nginx for Certbot
