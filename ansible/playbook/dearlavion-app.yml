@@ -143,6 +143,16 @@
       when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
+    # 🔄 Reload nginx AFTER service redeploy
+    # ----------------------------
+    - name: Reload nginx after service redeploy
+      become: true
+      command: docker exec dearlavion-nginx nginx -s reload
+      when:
+        - use_registry | bool
+        - deploy_service in ["auth", "core", "web-ui"]
+
+    # ----------------------------
     # Ensure Certbot is installed
     # ----------------------------
     - name: Ensure certbot is installed
