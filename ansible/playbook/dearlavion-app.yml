@@ -155,6 +155,7 @@
     - name: Reload nginx after service redeploy
       become: true
       command: docker exec dearlavion-nginx nginx -s reload
+      ignore_errors: true
       when:
         - use_registry | bool
         - deploy_service in ["auth", "core", "web-ui"]
