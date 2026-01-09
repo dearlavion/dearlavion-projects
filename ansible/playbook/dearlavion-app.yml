@@ -118,6 +118,13 @@
           - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
       when: deploy_service == "auth" and (use_registry | bool)
 
+    - name: Remove Core Service container (force fresh redeploy)
+      community.docker.docker_container:
+        name: dearlavion-core-service
+        state: absent
+        force_kill: yes
+      when: deploy_service == "core" and (use_registry | bool)
+
     - name: Pull and run Core Service
       community.docker.docker_container:
         name: dearlavion-core-service
