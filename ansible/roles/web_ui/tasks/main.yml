@@ -17,8 +17,3 @@
     restart_policy: always
     networks:
       - name: dearlavion-net
-
-- name: Reload nginx after service redeploy
-  become: true
-  command: docker exec dearlavion-nginx nginx -s reload
-  ignore_errors: true
