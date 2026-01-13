@@ -46,10 +46,9 @@ jobs:
           ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
       - name: Run Playbook
+        working-directory: dearlavion-projects/ansible
         run: |
           export PATH=$HOME/.local/bin:$PATH
-          ansible-playbook \
-            -i dearlavion-projects/ansible/inventory/hosts.ini \
-            dearlavion-projects/ansible/playbook/site.yml \
+          ansible-playbook playbook/site.yml \
             -e "target=${{ inputs.target }} env=${{ inputs.env }} \
             ghcr_pat=${{ secrets.DEARLAVION_PAT }}"
