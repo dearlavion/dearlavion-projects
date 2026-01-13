@@ -1,0 +1,3 @@
+- name: Reload nginx
+  become: true
+  command: docker exec dearlavion-nginx nginx -s reload

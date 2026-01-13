@@ -1,0 +1,64 @@
+# ----------------------------
+# Ensure base directories exist
+# ----------------------------
+- name: Ensure /opt/dearlavion exists
+  become: true
+  file:
+    path: /opt/dearlavion
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure Redis data directory exists
+  become: true
+  file:
+    path: "{{ redis_data_dir | default('/opt/dearlavion/redis') }}"
+    state: directory
+    owner: 999
+    group: 999
+    mode: "0755"
+
+# ----------------------------
+# Optional DEV reset (explicit only)
+# ----------------------------
+- name: Stop Redis container (DEV reset only)
+  community.docker.docker_container:
+    name: "{{ redis_container_name }}"
+    state: stopped
+
+- name: Remove Redis data directory (DEV reset only)
+  become: true
+  file:
+    path: "{{ redis_data_dir | default('/opt/dearlavion/redis') }}"
+    state: absent
+
+- name: Recreate Redis data directory after reset
+  become: true
+  file:
+    path: "{{ redis_data_dir | default('/opt/dearlavion/redis') }}"
+    state: directory
+    owner: 999
+    group: 999
+    mode: "0755"
+
+# ----------------------------
+# Run Redis container
+# ----------------------------
+- name: Run Redis container with persistent data
+  community.docker.docker_container:
+    name: "{{ redis_container_name }}"
+    image: "{{ redis_image }}"
+    pull: yes
+    state: "{{ redis_state | default('started') }}"
+    restart_policy: "{{ redis_restart_policy | default('unless-stopped') }}"
+    volumes:
+      - "{{ redis_data_dir | default('/opt/dearlavion/redis') }}:/data"
+    networks:
+      - name: "{{ redis_network | default('dearlavion-net') }}"
+    ports:
+      - "{{ redis_port | default(6379) }}:{{ redis_port | default(6379) }}"
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec

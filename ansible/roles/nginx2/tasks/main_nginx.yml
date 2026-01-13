@@ -1,0 +1,100 @@
+- name: Remove temporary Nginx container
+  become: true
+  community.docker.docker_container:
+    name: dearlavion-nginx-temp
+    state: absent
+    force_kill: yes
+
+# ----------------------------
+# Stop host nginx if installed
+# ----------------------------
+- name: Stop host nginx if running
+  become: true
+  service:
+    name: nginx
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+# ----------------------------
+# Ensure project directories exist
+# ----------------------------
+- name: Ensure project directories exist
+  become: true
+  file:
+    path: /opt/dearlavion/nginx
+    state: directory
+    mode: "0755"
+
+# ----------------------------
+# Copy configs
+# ----------------------------
+- name: Copy nginx.conf
+  become: true
+  copy:
+    src: nginx/nginx.conf
+    dest: /opt/dearlavion/nginx/nginx.conf
+
+- name: Deploy site config
+  become: true
+  template:
+    src: nginx/dearlavion-app.conf.j2
+    dest: /opt/dearlavion/nginx/dearlavion-app.conf
+
+# ----------------------------
+# SSL setup
+# ----------------------------
+- name: Include SSL tasks
+  include_tasks: ssl.yml
+
+# ----------------------------
+# Docker Compose
+# ----------------------------
+- name: Deploy docker-compose file
+  become: true
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/dearlavion/docker-compose.yml
+
+# ----------------------------
+# Start Docker stack
+# ----------------------------
+- name: Start Docker stack
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /opt/dearlavion
+    state: present
+
+# ----------------------------
+# Pre-check: Ensure dependent services are running
+# ----------------------------
+- name: Check if dependent services are running
+  community.docker.docker_container_info:
+    name: "{{ item }}"
+  register: service_info
+  loop:
+    - dearlavion-web-ui
+    - dearlavion-authentication-service
+    - dearlavion-core-service
+  ignore_errors: yes
+
+- name: Warn if any dependent service is not running
+  debug:
+    msg: >
+      WARNING: Service '{{ item.item }}' is not running! 
+      Nginx may fail to start because upstream host will be unavailable.
+  when: item.container is not defined or not item.container.State.Running
+  loop: "{{ service_info.results }}"
+  ignore_errors: yes
+
+# ----------------------------
+# Wait for nginx container to be running
+# ----------------------------
+- name: Wait for nginx container to be running
+  community.docker.docker_container_info:
+    name: dearlavion-nginx
+  register: nginx_info
+  until: nginx_info.container.State.Running
+  retries: 5
+  delay: 2
+  ignore_errors: false

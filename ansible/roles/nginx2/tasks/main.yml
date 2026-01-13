@@ -1,0 +1,44 @@
+---
+# ----------------------------
+# 0️⃣ Stop host nginx if installed
+# ----------------------------
+- name: Stop host nginx if running
+  become: true
+  service:
+    name: nginx
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+# ----------------------------
+# 1️⃣ Tear down old Docker stack (only if rebuild)
+# ----------------------------
+- name: Tear down nginx stack to clear old network references
+  become: true
+  community.docker.docker_compose_v2:
+    project_src: /opt/dearlavion
+    state: absent
+
+- name: Certbot Pre-checks
+  include_tasks: certbot_precheck.yml
+
+- name: Setup Temporary NGINX
+  include_tasks: temp_nginx.yml
+
+# ----------------------------
+# 🔐 Renew SSL certificates (safe every run)
+# ----------------------------
+- name: Obtain or renew SSL certificates
+  become: true
+  command: >
+    certbot certonly --webroot
+    -w /opt/dearlavion/certbot-webroot
+    {% for domain in server_names %}-d {{ domain }} {% endfor %}
+    --non-interactive
+    --agree-tos
+    -m {{ email }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+
+- name: Setup Dear Lavion NGINX
+  include_tasks: main_nginx.yml

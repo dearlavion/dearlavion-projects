@@ -150,6 +150,14 @@
       when: deploy_service == "web-ui" and (use_registry | bool)
 
     # ----------------------------
+    # Redis (optional)
+    # ----------------------------
+    - name: Manage Redis
+      include_role:
+        name: redis
+      when: enable_redis | default(false) | bool
+
+    # ----------------------------
     # 🔄 Reload nginx AFTER service redeploy
     # ----------------------------
     - name: Reload nginx after service redeploy

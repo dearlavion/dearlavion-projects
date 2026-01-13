@@ -1,0 +1,58 @@
+---
+- name: Deploy Dear Lavion App
+  hosts: dearlavion-app_{{ env }}
+  gather_facts: yes
+
+  vars:
+    run_auth: "{{ target in ['auth', 'all'] }}"
+    run_core: "{{ target in ['core', 'all'] }}"
+    run_web_ui: "{{ target in ['web-ui', 'all'] }}"
+    run_redis: "{{ target in ['redis', 'all'] }}"
+    run_nginx: "{{ target in ['nginx2', 'all'] }}"
+    renew_cert: "{{ target in ['certificate', 'all'] }}"
+
+  pre_tasks:
+    - name: Setup system dependencies
+      include_role:
+        name: common
+
+    - name: Setup docker network
+      include_role:
+        name: docker_network
+
+  roles:
+    - role: auth
+      when: run_auth
+
+    - role: core
+      when: run_core
+
+    - role: web_ui
+      when: run_web_ui
+
+    - role: redis
+      when: run_redis
+
+    - role: nginx2
+      when: run_nginx
+
+    - role: certificate
+      when: renew_cert
+
+  post_tasks:
+    # ----------------------------
+    # 🔄 Reload nginx AFTER service redeploy
+    # ----------------------------
+    - name: Reload nginx after service redeploy
+      become: true
+      command: docker exec dearlavion-nginx nginx -s reload
+      ignore_errors: true
+      when: run_nginx == false
+
+    - name: Final sanity check
+      debug:
+        msg: >
+          🎉 Deployment completed successfully
+          target={{ target }},
+          env={{ env }},
+          host={{ inventory_hostname }}

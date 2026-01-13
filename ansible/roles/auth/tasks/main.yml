@@ -1,0 +1,26 @@
+- name: Ensure Docker Registry login
+  include_role:
+    name: docker_registry
+
+- name: Remove Auth Service container (force redeploy)
+  community.docker.docker_container:
+    name: dearlavion-authentication-service
+    state: absent
+    force_kill: yes
+
+- name: Pull and run Authentication Service
+  community.docker.docker_container:
+    name: dearlavion-authentication-service
+    image: "{{ auth_image }}"
+    pull: yes
+    state: started
+    restart_policy: always
+    networks:
+      - name: dearlavion-net
+    ports:
+      - "{{ auth_port }}:{{ auth_port }}"
+
+- name: Reload nginx after service redeploy
+  become: true
+  command: docker exec dearlavion-nginx nginx -s reload
+  ignore_errors: true

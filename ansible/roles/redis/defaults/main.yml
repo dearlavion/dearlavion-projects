@@ -1,0 +1,14 @@
+# Container
+redis_container_name: dearlavion-redis
+redis_image: redis:7-alpine
+
+# Networking
+redis_network: dearlavion-net
+redis_port: 6379
+
+# Lifecycle
+# started | stopped | absent | restarted
+redis_state: started
+
+# Runtime
+redis_restart_policy: unless-stopped

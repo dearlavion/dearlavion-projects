@@ -1,0 +1,5 @@
+- name: Log in to GHCR
+  community.docker.docker_login:
+    registry_url: "{{ registry_url }}"
+    username: "{{ registry_user }}"
+    password: "{{ ghcr_pat }}"

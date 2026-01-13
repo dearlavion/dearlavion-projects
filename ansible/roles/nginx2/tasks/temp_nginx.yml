@@ -1,0 +1,39 @@
+- name: Remove temporary Nginx container
+  become: true
+  community.docker.docker_container:
+    name: dearlavion-nginx-temp
+    state: absent
+    force_kill: yes
+
+- name: Render temporary Nginx template for Certbot
+  become: true
+  template:
+    src: ../files/nginx/temp-certbot.conf
+    dest: /opt/dearlavion/nginx/temp-certbot.conf
+
+- name: Check if main Nginx container exists
+  community.docker.docker_container_info:
+    name: dearlavion-nginx
+  register: nginx_info
+  failed_when: false
+
+- name: Stop main Nginx temporarily (only if it exists)
+  community.docker.docker_container:
+    name: dearlavion-nginx
+    state: stopped
+  when:
+    - nginx_info.exists
+
+# ----------------------------
+# Deploy minimal Nginx for Certbot
+# ----------------------------
+- name: Run temporary Nginx with docker run
+  shell: |
+    docker rm -f dearlavion-nginx-temp || true
+    docker run -d \
+      --name dearlavion-nginx-temp \
+      -p 80:80 \
+      --network dearlavion-net \
+      -v /opt/dearlavion/certbot-webroot:/var/www/certbot:rw \
+      -v /opt/dearlavion/nginx/temp-certbot.conf:/etc/nginx/conf.d/default.conf:ro \
+      nginx:1.25-alpine

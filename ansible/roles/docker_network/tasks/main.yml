@@ -1,0 +1,14 @@
+# roles/docker_network/tasks/main.yml
+---
+- name: Create Docker network
+  community.docker.docker_network:
+    name: dearlavion-net
+    state: present
+    driver: bridge
+    driver_options:
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    ipam_config:
+      - subnet: 172.25.0.0/16
+        gateway: 172.25.0.1
+    attachable: yes
+

@@ -1,0 +1,46 @@
+# common-ansible.yml
+name: Run Ansible
+
+on:
+  workflow_call:
+    inputs:
+      target:
+        required: true
+        type: string
+      env:
+        required: true
+        type: string
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Checkout Ansible repo
+        uses: actions/checkout@v4
+        with:
+          repository: dearlavion/dearlavion-projects
+          path: dearlavion-projects
+          token: ${{ secrets.DEARLAVION_PAT }}
+
+      - name: Install Ansible
+        run: |
+          python3 -m pip install --user ansible docker
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $(grep ansible_host dearlavion-projects/ansible/inventory/hosts.ini | awk '{print $2}') >> ~/.ssh/known_hosts
+
+      - name: Run Playbook
+        run: |
+          ansible-playbook \
+            -i dearlavion-projects/ansible/inventory/hosts.ini \
+            dearlavion-projects/ansible/playbook/site.yml \
+            -e "target=${{ inputs.target }} env=${{ inputs.env }}"

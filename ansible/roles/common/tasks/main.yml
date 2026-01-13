@@ -1,0 +1,50 @@
+# roles/common/tasks/main.yml
+---
+- name: Load environment variables
+  include_vars:
+    file: "../../../group_vars/dearlavion-app_{{ env }}.yml"
+
+- name: Ensure baish has passwordless sudo
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^baish ALL=.*NOPASSWD:ALL'
+    line: 'baish ALL=(ALL) NOPASSWD:ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Ensure Python3 and pip3 are installed
+  become: true
+  apt:
+    name:
+      - python3
+      - python3-pip
+    state: present
+
+- name: Ensure Docker is installed
+  become: true
+  apt:
+    name: docker.io
+    state: present
+
+- name: Add user to docker group
+  become: true
+  user:
+    name: baish
+    groups: docker
+    append: yes
+
+- name: Install Docker Compose CLI plugin v2
+  become: true
+  shell: |
+    mkdir -p /usr/local/lib/docker/cli-plugins
+    curl -SL https://github.com/docker/compose/releases/download/v2.24.2/docker-compose-linux-x86_64 \
+      -o /usr/local/lib/docker/cli-plugins/docker-compose
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+  args:
+    creates: /usr/local/lib/docker/cli-plugins/docker-compose

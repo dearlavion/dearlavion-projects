@@ -1,0 +1,25 @@
+- name: Check if nginx container is running
+  community.docker.docker_container_info:
+    name: "dearlavion-nginx"
+  register: nginx_info
+  failed_when: false
+  changed_when: false
+
+# ----------------------------
+# 🔐 Renew SSL certificates
+# ----------------------------
+- name: Renew Let's Encrypt certificates (if needed)
+  become: true
+  command: certbot renew
+  register: certbot_result
+  changed_when: "'Congratulations' in certbot_result.stdout"
+  when: nginx_info.container is defined and nginx_info.container.State.Running
+
+# ----------------------------
+# 🔄 Reload nginx if cert was renewed
+# ----------------------------
+- name: Reload nginx to apply renewed certificates
+  become: true
+  command: docker exec {{ nginx_container_name }} nginx -s reload
+  when:
+    - certbot_result is changed

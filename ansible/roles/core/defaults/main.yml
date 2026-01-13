@@ -1,0 +1,2 @@
+core_image: ghcr.io/dearlavion/dearlavion-core-service:dev
+core_port: 8082

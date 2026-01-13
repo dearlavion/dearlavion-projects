@@ -1,0 +1,19 @@
+# infra-deploy.yml
+name: Deploy Infrastructure (DEV)
+
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        description: nginx | redis | certificate | all
+        required: true
+      env:
+        default: dev
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/common-ansible.yml
+    with:
+      target: ${{ inputs.component }}
+      env: ${{ inputs.env }}
+    secrets: inherit

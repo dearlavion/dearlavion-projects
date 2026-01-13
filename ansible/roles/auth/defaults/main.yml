@@ -1,0 +1,2 @@
+auth_image: ghcr.io/dearlavion/dearlavion-authentication-service:dev
+auth_port: 8081
