@@ -14,6 +14,10 @@ on:
 jobs:
   ansible:
     runs-on: ubuntu-latest
+    env:
+      SSH_USER: baish
+      SSH_HOST: 157.173.97.37
+
 
     steps:
       - name: Checkout repo
@@ -26,17 +30,20 @@ jobs:
           path: dearlavion-projects
           token: ${{ secrets.DEARLAVION_PAT }}
 
-      - name: Install Ansible
+      - name: Install Ansible & Docker module
         run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-venv
+          python3 -m pip install --upgrade pip
           python3 -m pip install --user ansible docker
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          export PATH=$HOME/.local/bin:$PATH
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.DEV_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $(grep ansible_host dearlavion-projects/ansible/inventory/hosts.ini | awk '{print $2}') >> ~/.ssh/known_hosts
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
 
       - name: Run Playbook
         run: |
