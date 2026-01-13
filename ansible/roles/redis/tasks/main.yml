@@ -22,25 +22,12 @@
 # ----------------------------
 # Optional DEV reset (explicit only)
 # ----------------------------
-- name: Stop Redis container (DEV reset only)
+- name: Stop and remove Redis container (DEV reset only)
   community.docker.docker_container:
     name: "{{ redis_container_name }}"
-    state: stopped
-
-- name: Remove Redis data directory (DEV reset only)
-  become: true
-  file:
-    path: "{{ redis_data_dir | default('/opt/dearlavion/redis') }}"
     state: absent
-
-- name: Recreate Redis data directory after reset
-  become: true
-  file:
-    path: "{{ redis_data_dir | default('/opt/dearlavion/redis') }}"
-    state: directory
-    owner: 999
-    group: 999
-    mode: "0755"
+    force_kill: yes
+  ignore_errors: yes   # optional if container may not exist
 
 # ----------------------------
 # Run Redis container
