@@ -136,6 +136,9 @@
           - name: dearlavion-net
         ports:
           - "{{ core_port }}:{{ core_port }}"  # Core: host 8082 → container 8082
+        dns:
+          - 8.8.8.8
+          - 8.8.4.4
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
