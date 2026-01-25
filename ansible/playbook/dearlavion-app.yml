@@ -118,27 +118,16 @@
           - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
       when: deploy_service == "auth" and (use_registry | bool)
 
-    - name: Remove Core Service container (force fresh redeploy)
-      community.docker.docker_container:
-        name: dearlavion-core-service
-        state: absent
-        force_kill: yes
-      when: deploy_service == "core" and (use_registry | bool)
-
-    - name: Pull and run Core Service
-      community.docker.docker_container:
-        name: dearlavion-core-service
-        image: ghcr.io/dearlavion/dearlavion-core-service:dev
-        pull: yes            # <-- always pull the latest image
-        state: started     # <-- restart container even if it exists
-        restart_policy: always
-        networks:
-          - name: dearlavion-net
-        ports:
-          - "{{ core_port }}:{{ core_port }}"  # Core: host 8082 → container 8082
-        dns:
-          - 8.8.8.8
-          - 8.8.4.4
+    - name: Run Core Service with stable DNS
+      shell: |
+        docker rm -f dearlavion-core-service || true
+        docker run -d \
+          --name dearlavion-core-service \
+          --restart always \
+          --network dearlavion-net \
+          --dns 8.8.8.8 --dns 8.8.4.4 \
+          -p {{ core_port }}:{{ core_port }} \
+          ghcr.io/dearlavion/dearlavion-core-service:dev
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
