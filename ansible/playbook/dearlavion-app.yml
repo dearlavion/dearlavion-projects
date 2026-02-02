@@ -130,7 +130,7 @@
     - name: Run Core Service with stable DNS
       shell: |
         docker rm -f dearlavion-core-service || true
-        docker run -d \
+        docker run --pull=always -d \
           --name dearlavion-core-service \
           --restart always \
           --network dearlavion-net \
