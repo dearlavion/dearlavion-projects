@@ -102,14 +102,14 @@
         username: baish
         password: "{{ ghcr_pat }}"
 
-    - name: Ensure custom resolv.conf exists
-      copy:
-        dest: /opt/dearlavion/resolv.conf
-        content: |
-          nameserver 8.8.8.8
-          nameserver 8.8.4.4
-          options edns0 trust-ad
-      become: true
+    #- name: Ensure custom resolv.conf exists
+    #  copy:
+    #    dest: /opt/dearlavion/resolv.conf
+    #    content: |
+    #      nameserver 8.8.8.8
+    #      nameserver 8.8.4.4
+    #      options edns0 trust-ad
+    #  become: true
 
     # ----------------------------
     # Pull & run services from GHCR
@@ -134,7 +134,6 @@
           --name dearlavion-core-service \
           --restart always \
           --network dearlavion-net \
-          -v /opt/dearlavion/resolv.conf:/etc/resolv.conf:ro \
           --dns 8.8.8.8 --dns 8.8.4.4 \
           -p {{ core_port }}:{{ core_port }} \
           ghcr.io/dearlavion/dearlavion-core-service:dev
