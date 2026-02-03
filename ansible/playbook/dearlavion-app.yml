@@ -102,15 +102,15 @@
         username: baish
         password: "{{ ghcr_pat }}"
 
-    - name: Ensure custom resolv.conf exists
-      copy:
-        dest: /opt/dearlavion/resolv.conf
-        content: |
-          nameserver 127.0.0.11
-          nameserver 8.8.8.8
-          nameserver 8.8.4.4
-          options edns0 trust-ad
-      become: true
+    #- name: Ensure custom resolv.conf exists
+    #  copy:
+    #    dest: /opt/dearlavion/resolv.conf
+    #    content: |
+    #      nameserver 127.0.0.11
+    #      nameserver 8.8.8.8
+    #      nameserver 8.8.4.4
+    #      options edns0 trust-ad
+    #  become: true
 
     # ----------------------------
     # Pull & run services from GHCR
@@ -128,16 +128,17 @@
           - "{{ auth_port }}:{{ auth_port }}" # Auth: host 8081 → container 8081
       when: deploy_service == "auth" and (use_registry | bool)
 
-    - name: Run Core Service with stable DNS
-      shell: |
-        docker rm -f dearlavion-core-service || true
-        docker run --pull=always -d \
-          --name dearlavion-core-service \
-          --restart always \
-          --network dearlavion-net \
-          --volume /opt/dearlavion/resolv.conf:/etc/resolv.conf:ro \
-          -p {{ core_port }}:{{ core_port }} \
-          ghcr.io/dearlavion/dearlavion-core-service:dev
+    - name: Pull and run Core Service
+      community.docker.docker_container:
+        name: dearlavion-core-service
+        image: ghcr.io/dearlavion/dearlavion-core-service:dev
+        pull: yes
+        state: started
+        restart_policy: always
+        networks:
+          - name: dearlavion-net
+        ports:
+          - "{{ core_port }}:{{ core_port }}"
       when: deploy_service == "core" and (use_registry | bool)
 
     - name: Pull and run Web UI
