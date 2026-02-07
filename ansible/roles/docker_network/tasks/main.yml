@@ -12,3 +12,14 @@
         gateway: 172.25.0.1
     attachable: yes
 
+# ----------------------------
+# Ensure Docker subnet has forwarding (internet access)
+# ----------------------------
+- name: Ensure FORWARD chain allows dearlavion-net outbound traffic
+  become: true
+  ansible.builtin.shell: |
+    iptables -C FORWARD -s 172.25.0.0/16 -j ACCEPT || iptables -I FORWARD 1 -s 172.25.0.0/16 -j ACCEPT
+    iptables -C FORWARD -d 172.25.0.0/16 -j ACCEPT || iptables -I FORWARD 1 -d 172.25.0.0/16 -j ACCEPT
+  args:
+    warn: false
+
