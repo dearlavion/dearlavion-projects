@@ -1,3 +1,7 @@
+Access local AKHQ UI:
+http://localhost:8080
+
+
 1️⃣ Create a topic
 
 Kafka organizes messages into topics. First, create one called test-topic.
