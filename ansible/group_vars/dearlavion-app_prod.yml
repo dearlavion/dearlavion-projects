@@ -1,3 +1,2 @@
-use_ngrok: false
 compose_file: docker-compose.prod.yml
 app_path: "{{ lookup('env','PWD') }}/dearlavion-app"
