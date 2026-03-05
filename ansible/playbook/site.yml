@@ -10,6 +10,7 @@
     run_redis: "{{ target in ['redis', 'all'] }}"
     run_nginx: "{{ target in ['nginx2', 'all'] }}"
     renew_cert: "{{ target in ['certificate', 'all'] }}"
+    run_kafka: "{{ target in ['kafka', 'all'] }}"
 
   pre_tasks:
     - name: Setup system dependencies
@@ -38,6 +39,9 @@
 
     - role: certificate
       when: renew_cert
+
+    - role: kafka
+      when: run_kafka
 
   post_tasks:
     # ----------------------------
