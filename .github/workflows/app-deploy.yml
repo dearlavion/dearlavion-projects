@@ -5,8 +5,14 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: auth | core | web-ui | notification
+        description: "Service to deploy"
         required: true
+        type: choice
+        options:
+          - auth
+          - core
+          - web-ui
+          - notification
       env:
         default: dev
 
