@@ -1,0 +1,21 @@
+- name: Ensure Docker Registry login
+  include_role:
+    name: docker_registry
+
+- name: Remove Notification Service container (force redeploy)
+  community.docker.docker_container:
+    name: dearlavion-notification-service
+    state: absent
+    force_kill: yes
+
+- name: Pull and run Core Service
+  community.docker.docker_container:
+    name: dearlavion-notification-service
+    image: "{{ notification_image }}"
+    pull: yes
+    state: started
+    restart_policy: always
+    networks:
+      - name: dearlavion-net
+    ports:
+      - "{{ notification_port }}:{{ notification_port }}"

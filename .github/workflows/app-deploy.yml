@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: auth | core | web-ui
+        description: auth | core | web-ui | notification
         required: true
       env:
         default: dev

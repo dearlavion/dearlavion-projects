@@ -1,0 +1,2 @@
+notification_image: ghcr.io/dearlavion/dearlavion-notification-service:dev
+notification_port: 8083
