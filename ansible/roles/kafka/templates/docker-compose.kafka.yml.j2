@@ -39,7 +39,7 @@ services:
 
   akhq:
     image: tchiotludo/akhq:latest
-    container_name: akhq
+    container_name: {{ akhq_ui }}
     restart: unless-stopped
     networks:
       - dearlavion-net
