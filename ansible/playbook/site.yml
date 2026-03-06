@@ -11,6 +11,7 @@
     run_nginx: "{{ target in ['nginx2', 'all'] }}"
     renew_cert: "{{ target in ['certificate', 'all'] }}"
     run_kafka: "{{ target in ['kafka', 'all'] }}"
+    run_notification: "{{ target in ['notification', 'all'] }}"
 
   pre_tasks:
     - name: Setup system dependencies
@@ -42,6 +43,9 @@
 
     - role: kafka
       when: run_kafka
+
+    - role: notification
+      when: run_notification
 
   post_tasks:
     # ----------------------------
