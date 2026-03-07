@@ -22,29 +22,37 @@
       include_role:
         name: docker_network
 
-  roles:
-    - role: auth
+  tasks:
+    - include_role:
+        name: auth
       when: run_auth
 
-    - role: core
+    - include_role:
+        name: core
       when: run_core
 
-    - role: web_ui
+    - include_role:
+        name: web_ui
       when: run_web_ui
 
-    - role: redis
+    - include_role:
+        name: redis
       when: run_redis
 
-    - role: nginx2
+    - include_role:
+        name: nginx2
       when: run_nginx
 
-    - role: certificate
+    - include_role:
+        name: certificate
       when: renew_cert
 
-    - role: kafka
+    - include_role:
+        name: kafka
       when: run_kafka
 
-    - role: notification
+    - include_role:
+        name: notification
       when: run_notification
 
   post_tasks:
