@@ -8,7 +8,7 @@
     run_core: "{{ target in ['core', 'all'] }}"
     run_web_ui: "{{ target in ['web-ui', 'all'] }}"
     run_redis: "{{ target in ['redis', 'all'] }}"
-    run_nginx: "{{ target in ['nginx2', 'all'] }}"
+    run_nginx: "{{ target in ['nginx', 'all'] }}"
     renew_cert: "{{ target in ['certificate', 'all'] }}"
     run_kafka: "{{ target in ['kafka', 'all'] }}"
     run_notification: "{{ target in ['notification', 'all'] }}"
