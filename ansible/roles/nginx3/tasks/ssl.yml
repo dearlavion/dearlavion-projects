@@ -1,0 +1,47 @@
+---
+# -----------------------------
+# Install Certbot on host
+# -----------------------------
+- name: Ensure Certbot is installed
+  become: true
+  apt:
+    name: certbot
+    state: present
+    update_cache: true
+
+# -----------------------------
+# Prepare webroot for HTTP-01 validation
+# -----------------------------
+- name: Ensure webroot exists for ACME challenge
+  become: true
+  file:
+    path: /opt/dearlavion/certbot-webroot
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+# -----------------------------
+# Obtain SSL certificates (only if missing)
+# -----------------------------
+- name: Obtain SSL certificates from Let's Encrypt
+  become: true
+  command: >
+    certbot certonly --webroot
+    -w /opt/dearlavion/certbot-webroot
+    {% for domain in server_names %}-d {{ domain }} {% endfor %}
+    --non-interactive
+    --agree-tos
+    -m {{ email }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+  notify: Reload nginx
+
+# -----------------------------
+# Renew certificates safely
+# -----------------------------
+- name: Renew certificates (safe every run)
+  become: true
+  command: certbot renew
+  notify: Reload nginx
+

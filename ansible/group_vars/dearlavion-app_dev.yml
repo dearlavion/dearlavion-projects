@@ -10,11 +10,14 @@ core_service: dearlavion-core-service
 notification_service: dearlavion-notification-service
 web_ui_service: dearlavion-web-ui
 akhq_ui: dearlavion-akhq
+api_gateway: dearlavion-api-gateway
+
 
 web_ui_port: 80
 auth_port: 8081
 core_port: 8082
 notification_port: 8083
+api_gateway_port: 8084
 akhq_port: 9000
 server_names:
   - dearlavion.site

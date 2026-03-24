@@ -1,0 +1,3 @@
+nginx_container_name: dearlavion-nginx
+server_names: ['dearlavion.site']
+email: 'dearlavion@gmail.com'

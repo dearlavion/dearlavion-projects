@@ -2,20 +2,20 @@
   include_role:
     name: docker_registry
 
-- name: Remove Notification Service container (force redeploy)
+- name: Remove API Gateway container (force redeploy)
   community.docker.docker_container:
-    name: dearlavion-notification-service
+    name: dearlavion-api-gateway
     state: absent
     force_kill: yes
 
-- name: Pull and run Notification Service
+- name: Pull and run API Gateway
   community.docker.docker_container:
-    name: dearlavion-notification-service
-    image: "{{ notification_image }}"
+    name: dearlavion-api-gateway
+    image: "{{ api_gateway_image }}"
     pull: yes
     state: started
     restart_policy: always
     networks:
       - name: dearlavion-net
     ports:
-      - "{{ notification_port }}:{{ notification_port }}"
+      - "{{ api_gateway_port }}:{{ api_gateway_port }}"
