@@ -17,5 +17,5 @@
     restart_policy: always
     networks:
       - name: dearlavion-net
-    ports:
-      - "{{ api_gateway_port }}:{{ api_gateway_port }}"
+    expose:
+      - "{{ api_gateway_internal_port }}"

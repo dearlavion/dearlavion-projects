@@ -17,7 +17,7 @@ web_ui_port: 80
 auth_port: 8081
 core_port: 8082
 notification_port: 8083
-api_gateway_port: 8084
+api_gateway_internal_port: 8080
 akhq_port: 9000
 server_names:
   - dearlavion.site
