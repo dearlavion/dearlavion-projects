@@ -19,3 +19,8 @@
       - name: dearlavion-net
     expose:
       - "{{ api_gateway_internal_port }}"
+    env:
+      auth_port: "{{ auth_port }}"
+      core_port: "{{ core_port }}"
+      notification_port: "{{ notification_port }}"
+      akhq_port: "{{ akhq_port }}"
