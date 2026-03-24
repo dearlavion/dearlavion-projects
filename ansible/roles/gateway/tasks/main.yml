@@ -20,7 +20,7 @@
     expose:
       - "{{ api_gateway_internal_port }}"
     env:
-      auth_port: "{{ auth_port | string }}"
-      core_port: "{{ core_port | string }}"
-      notification_port: "{{ notification_port | string }}"
-      akhq_port: "{{ akhq_port | string }}"
+      auth_port: "8081"
+      core_port: "8082"
+      notification_port: "8083"
+      akhq_port: "9000"
