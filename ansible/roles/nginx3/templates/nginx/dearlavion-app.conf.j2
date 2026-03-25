@@ -65,7 +65,7 @@ server {
 
     # All API traffic → Spring Gateway
     location /api/ {
-        proxy_pass http://api_gateway/;
+        proxy_pass http://api_gateway;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
