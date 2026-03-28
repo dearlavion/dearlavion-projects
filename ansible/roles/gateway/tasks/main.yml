@@ -4,13 +4,13 @@
 
 - name: Remove API Gateway container (force redeploy)
   community.docker.docker_container:
-    name: dearlavion-api-gateway
+    name: dearlavion-gateway-service
     state: absent
     force_kill: yes
 
 - name: Pull and run API Gateway
   community.docker.docker_container:
-    name: dearlavion-api-gateway
+    name: dearlavion-gateway-service
     image: "{{ api_gateway_image }}"
     pull: yes
     state: started

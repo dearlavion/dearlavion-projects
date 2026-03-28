@@ -22,7 +22,7 @@ upstream notification_service {
 }
 
 upstream api_gateway {
-    server dearlavion-api-gateway:{{ api_gateway_internal_port }};
+    server dearlavion-gateway-service:{{ api_gateway_internal_port }};
 }
 
 # ======================

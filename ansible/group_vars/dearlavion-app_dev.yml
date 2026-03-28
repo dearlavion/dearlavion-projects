@@ -10,7 +10,7 @@ core_service: dearlavion-core-service
 notification_service: dearlavion-notification-service
 web_ui_service: dearlavion-web-ui
 akhq_ui: dearlavion-akhq
-api_gateway: dearlavion-api-gateway
+api_gateway: dearlavion-gateway-service
 
 
 web_ui_port: 80

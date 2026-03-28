@@ -73,7 +73,7 @@
     name: "{{ item }}"
   register: service_info
   loop:
-    - dearlavion-api-gateway
+    - dearlavion-gateway-service
     - dearlavion-web-ui
     - dearlavion-authentication-service
     - dearlavion-core-service
