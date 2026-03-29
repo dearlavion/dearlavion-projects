@@ -32,8 +32,8 @@
     state: started
     restart_policy: unless-stopped
     ports:
-      - "{{ minio_s3_api_port }}:{{ minio_s3_api_port }}"
-      - "{{ minio_web_console_port }}:{{ minio_web_console_port }}"
+      - "{{ minio_s3_api_port }}:9000"
+      - "{{ minio_web_console_port }}:9001"
     env:
       MINIO_ROOT_USER: "{{ minio_root_user }}"
       MINIO_ROOT_PASSWORD: "{{ minio_root_password }}"
