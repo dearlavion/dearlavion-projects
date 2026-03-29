@@ -22,13 +22,13 @@
 - name: Pull MinIO image
   community.docker.docker_image:
     name: minio/minio
-    tag: latest
+    tag: "{{ minio_image_tag }}"
     source: pull
 
 - name: Run MinIO container
   community.docker.docker_container:
     name: dearlavion-minio
-    image: minio/minio:latest
+    image: "minio/minio:{{ minio_image_tag }}"
     state: started
     restart_policy: unless-stopped
     ports:
@@ -54,16 +54,17 @@
   retries: 10
   delay: 5
 
+# Create the bucket on first startup
 - name: Pull MinIO mc client image
   community.docker.docker_image:
     name: minio/mc
-    tag: latest
+    tag: {{ minio_mc_image_version }}
     source: pull
 
 - name: Create dearlavion-media bucket if not exists
   community.docker.docker_container:
     name: minio-init
-    image: minio/mc:latest
+    image: "minio/mc:{{ minio_mc_image_version }}"
     state: started
     auto_remove: true
     networks:
