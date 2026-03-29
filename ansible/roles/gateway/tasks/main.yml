@@ -11,14 +11,14 @@
 - name: Pull and run API Gateway
   community.docker.docker_container:
     name: dearlavion-gateway-service
-    image: "{{ api_gateway_image }}"
+    image: "{{ gateway_image }}"
     pull: yes
     state: started
     restart_policy: always
     networks:
       - name: dearlavion-net
     expose:
-      - "{{ api_gateway_internal_port }}"
+      - "{{ gateway_internal_port }}"
     env:
       auth_port: "8081"
       core_port: "8082"

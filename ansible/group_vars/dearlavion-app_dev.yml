@@ -1,26 +1,21 @@
-# General environment settings
-compose_file: docker-compose.dev.yml
-project_path: /home/baish/dearlavion-projects  # Absolute path on DEV server
-app_path: "{{ project_path }}/dearlavion-app"
-email: "dearlavion@gmail.com"
-
-# Optional: Docker Compose service names
-auth_service: dearlavion-authentication-service
-core_service: dearlavion-core-service
-notification_service: dearlavion-notification-service
-web_ui_service: dearlavion-web-ui
-akhq_ui: dearlavion-akhq
-api_gateway: dearlavion-gateway-service
-
-
+# UI Ports
 web_ui_port: 80
+
+# Service Ports
+gateway_internal_port: 8080
 auth_port: 8081
 core_port: 8082
 notification_port: 8083
-api_gateway_internal_port: 8080
+media_port: 8084
+
+# Kafka
 akhq_port: 9000
+
+# Image Server
+minio_s3_api_port: 9004
+minio_web_console_port: 9005
+
 server_names:
   - dearlavion.site
 
 renew_cert: false
-nginx_container_name: dearlavion-nginx

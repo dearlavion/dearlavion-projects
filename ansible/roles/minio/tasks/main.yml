@@ -1,0 +1,78 @@
+---
+# roles/minio/tasks/main.yml
+# Deploys MinIO as a persistent Docker container on the dev server.
+# Run this ONCE (or when upgrading MinIO) — NOT on every app deploy.
+
+- name: Create MinIO data directory
+  file:
+    path: "{{ minio_data_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create MinIO config directory
+  file:
+    path: "{{ minio_config_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Pull MinIO image
+  community.docker.docker_image:
+    name: minio/minio
+    tag: latest
+    source: pull
+
+- name: Run MinIO container
+  community.docker.docker_container:
+    name: dearlavion-minio
+    image: minio/minio:latest
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+      - "{{ minio_s3_api_port }}:{{ minio_s3_api_port }}"
+      - "{{ minio_web_console_port }}:{{ minio_web_console_port }}"
+    env:
+      MINIO_ROOT_USER: "{{ minio_root_user }}"
+      MINIO_ROOT_PASSWORD: "{{ minio_root_password }}"
+      MINIO_DOMAIN: ""
+    volumes:
+      - "{{ minio_data_dir }}:/data"
+      - "{{ minio_config_dir }}:/root/.minio"
+    command: "server /data --console-address :{{ minio_web_console_port }}"
+    networks:
+      - name: "{{ docker_network }}"
+
+- name: Wait for MinIO to be healthy
+  uri:
+    url: "http://localhost:{{ minio_s3_api_port }}/minio/health/live"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 5
+
+- name: Pull MinIO mc client image
+  community.docker.docker_image:
+    name: minio/mc
+    tag: latest
+    source: pull
+
+- name: Create dearlavion-media bucket if not exists
+  community.docker.docker_container:
+    name: minio-init
+    image: minio/mc:latest
+    state: started
+    auto_remove: true
+    networks:
+      - name: "{{ docker_network }}"
+    command: >
+      /bin/sh -c "
+        mc alias set local http://dearlavion-minio:9000
+        {{ minio_root_user }} {{ minio_root_password }} &&
+        mc mb --ignore-existing local/{{ minio_bucket }} &&
+        mc anonymous set download local/{{ minio_bucket }} &&
+        echo 'Bucket ready.'
+      "

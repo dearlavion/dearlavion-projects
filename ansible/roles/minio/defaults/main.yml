@@ -1,0 +1,9 @@
+minio_image: dearlavion-minio
+minio_data_dir: /opt/dearlavion/minio/data
+minio_config_dir: /opt/dearlavion/minio/config
+minio_bucket: dearlavion-media
+docker_network: dearlavion-net
+
+# These should be overridden by vault / secrets — never commit real values
+minio_root_user: minioadmin
+minio_root_password: minioadmin

@@ -1,0 +1,21 @@
+- name: Ensure Docker Registry login
+  include_role:
+    name: docker_registry
+
+- name: Remove Media Service container (force redeploy)
+  community.docker.docker_container:
+    name: dearlavion-media-service
+    state: absent
+    force_kill: yes
+
+- name: Pull and run Media Service
+  community.docker.docker_container:
+    name: dearlavion-media-service
+    image: "{{ media_image }}"
+    pull: yes
+    state: started
+    restart_policy: always
+    networks:
+      - name: dearlavion-net
+    ports:
+      - "{{ media_port }}:{{ media_port }}"

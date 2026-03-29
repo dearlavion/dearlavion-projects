@@ -4,15 +4,22 @@
   gather_facts: yes
 
   vars:
+    # UI
+    run_web_ui: "{{ target in ['web-ui', 'all'] }}"
+
+    # Services
     run_auth: "{{ target in ['auth', 'all'] }}"
     run_core: "{{ target in ['core', 'all'] }}"
-    run_web_ui: "{{ target in ['web-ui', 'all'] }}"
+    run_notification: "{{ target in ['notification', 'all'] }}"
+    run_gateway: "{{ target in ['gateway', 'all'] }}"
+    run_media: "{{ target in ['media', 'all'] }}"
+
+    # Infrastructure
     run_redis: "{{ target in ['redis', 'all'] }}"
     run_nginx: "{{ target in ['nginx', 'all'] }}"
     renew_cert: "{{ target in ['certificate', 'all'] }}"
     run_kafka: "{{ target in ['kafka', 'all'] }}"
-    run_notification: "{{ target in ['notification', 'all'] }}"
-    run_gateway: "{{ target in ['gateway', 'all'] }}"
+    run_minio: "{{ target in ['minio', 'all'] }}"
 
   pre_tasks:
     - name: Setup system dependencies
@@ -59,6 +66,14 @@
     - include_role:
         name: gateway
       when: run_gateway
+
+    - include_role:
+        name: media
+      when: run_media
+
+    - include_role:
+        name: minio
+      when: run_minio
 
   post_tasks:
     # ----------------------------
