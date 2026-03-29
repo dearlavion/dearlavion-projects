@@ -58,13 +58,13 @@
 - name: Pull MinIO mc client image
   community.docker.docker_image:
     name: minio/mc
-    tag: {{ minio_mc_image_version }}
+    tag: "{{ minio_mc_image_tag }}"
     source: pull
 
 - name: Create dearlavion-media bucket if not exists
   community.docker.docker_container:
     name: minio-init
-    image: "minio/mc:{{ minio_mc_image_version }}"
+    image: "minio/mc:{{ minio_mc_image_tag }}"
     state: started
     auto_remove: true
     networks:
