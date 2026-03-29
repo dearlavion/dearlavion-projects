@@ -4,6 +4,7 @@
 # Run this ONCE (or when upgrading MinIO) — NOT on every app deploy.
 
 - name: Create MinIO data directory
+  become: true
   file:
     path: "{{ minio_data_dir }}"
     state: directory
@@ -11,6 +12,7 @@
     mode: '0755'
 
 - name: Create MinIO config directory
+  become: true
   file:
     path: "{{ minio_config_dir }}"
     state: directory
