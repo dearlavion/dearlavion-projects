@@ -32,8 +32,6 @@
     state: started
     restart_policy: unless-stopped
     ports:
-      - "9000:9000"
-      - "9001:9001"
       - "{{ minio_s3_api_port }}:{{ minio_s3_api_port }}"
       - "{{ minio_web_console_port }}:{{ minio_web_console_port }}"
     env:
@@ -72,7 +70,7 @@
       - name: "{{ docker_network }}"
     command: >
       /bin/sh -c "
-        mc alias set local http://dearlavion-minio:9000
+        mc alias set local http://dearlavion-minio:{{ minio_s3_api_port }}
         {{ minio_root_user }} {{ minio_root_password }} &&
         mc mb --ignore-existing local/{{ minio_bucket }} &&
         mc anonymous set download local/{{ minio_bucket }} &&
