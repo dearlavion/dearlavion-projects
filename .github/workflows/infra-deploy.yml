@@ -5,8 +5,16 @@ on:
   workflow_dispatch:
     inputs:
       component:
-        description: nginx | redis | certificate | kafka | all
+        description: "Component to deploy"
         required: true
+        type: choice
+        options:
+          - nginx
+          - redis
+          - certificate
+          - kafka
+          - minio
+          - all
       env:
         default: dev
 
