@@ -31,23 +31,21 @@
     image: "minio/minio:{{ minio_image_tag }}"
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "{{ minio_s3_api_port }}:9000"
-      - "{{ minio_web_console_port }}:9001"
     env:
       MINIO_ROOT_USER: "{{ minio_root_user }}"
       MINIO_ROOT_PASSWORD: "{{ minio_root_password }}"
-      MINIO_DOMAIN: ""
+      MINIO_SERVER_URL: "https://{{ minio_server_url }}"
+      MINIO_BROWSER_REDIRECT_URL: "https://{{ minio_browser_url }}"
     volumes:
       - "{{ minio_data_dir }}:/data"
       - "{{ minio_config_dir }}:/root/.minio"
-    command: "server /data --console-address :{{ minio_web_console_port }}"
+    command: "server /data --console-address :{{ minio_internal_web_console_port }}"
     networks:
-      - name: "{{ docker_network }}"
+      - name: "{{ dearlavion_network }}"
 
 - name: Wait for MinIO to be healthy
   uri:
-    url: "http://localhost:{{ minio_s3_api_port }}/minio/health/live"
+    url: "http://dearlavion-minio:{{ minio_internal_s3_api_port }}/minio/health/live"
     status_code: 200
   register: result
   until: result.status == 200
@@ -71,7 +69,7 @@
       - name: "{{ docker_network }}"
     command: >
       /bin/sh -c "
-        mc alias set local http://dearlavion-minio:{{ minio_s3_api_port }}
+        mc alias set local http://dearlavion-minio:{{ minio_internal_s3_api_port }}
         {{ minio_root_user }} {{ minio_root_password }} &&
         mc mb --ignore-existing local/{{ minio_bucket }} &&
         mc anonymous set download local/{{ minio_bucket }} &&

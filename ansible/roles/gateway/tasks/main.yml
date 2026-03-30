@@ -16,11 +16,11 @@
     state: started
     restart_policy: always
     networks:
-      - name: dearlavion-net
+      - name: {{ dearlavion_network }}
     expose:
       - "{{ gateway_internal_port }}"
     env:
-      auth_port: "8081"
-      core_port: "8082"
-      notification_port: "8083"
-      akhq_port: "9000"
+      auth_port: "{{ auth_port }}"
+      core_port: "{{ core_port }}"
+      notification_port: "{{ notification_port }}"
+      media_port: "{{ media_port }}"

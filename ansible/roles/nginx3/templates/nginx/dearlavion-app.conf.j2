@@ -22,7 +22,15 @@ upstream notification_service {
 }
 
 upstream api_gateway {
-    server dearlavion-gateway-service:{{ api_gateway_internal_port }};
+    server dearlavion-gateway-service:{{ gateway_internal_port }};
+}
+
+upstream minio_api {
+    server dearlavion-minio:{{ minio_internal_s3_api_port }};
+}
+
+upstream minio_console {
+    server dearlavion-minio:{{ minio__internal_web_console_port }};
 }
 
 # ======================
@@ -81,6 +89,45 @@ server {
 
         proxy_next_upstream error timeout http_502 http_503 http_504;
         proxy_next_upstream_tries 3;
+    }
+}
+
+# ======================
+# NEW: MinIO S3 API
+# ======================
+server {
+    listen 443 ssl;
+    server_name {{ minio_server_url }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_names[0] }}/privkey.pem;
+
+    location / {
+        proxy_pass http://minio_api;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        client_max_body_size 0;
+    }
+}
+
+# ======================
+# NEW: MinIO Console
+# ======================
+server {
+    listen 443 ssl;
+    server_name {{ minio_browser_url }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_names[0] }}/privkey.pem;
+
+    location / {
+        proxy_pass http://minio_console;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 }
 

@@ -4,7 +4,6 @@ minio_mc_image_tag: RELEASE.2025-08-13T08-35-41Z
 minio_data_dir: /opt/dearlavion/minio/data
 minio_config_dir: /opt/dearlavion/minio/config
 minio_bucket: dearlavion-media
-docker_network: dearlavion-net
 
 # These should be overridden by vault / secrets — never commit real values
 minio_root_user: minioadmin

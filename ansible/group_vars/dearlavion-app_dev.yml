@@ -1,3 +1,7 @@
+# Docker network
+dearlavion_network: "dearlavion-net"
+
+
 # UI Ports
 web_ui_port: 80
 
@@ -12,8 +16,10 @@ media_port: 8084
 akhq_port: 9000
 
 # Image Server
-minio_s3_api_port: 9004
-minio_web_console_port: 9005
+minio_internal_s3_api_port: 9000
+minio_internal_web_console_port: 9001
+minio_server_url: "s3.dearlavion.site"
+minio_browser_url: "console-s3.dearlavion.site"
 
 server_names:
   - dearlavion.site

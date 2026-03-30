@@ -1,2 +1,1 @@
 gateway_image: ghcr.io/dearlavion/dearlavion-gateway-service:dev
-gateway_internal_port: 8080
