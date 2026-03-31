@@ -72,7 +72,7 @@
     state: started
     auto_remove: true
     networks:
-      - name: "{{ docker_network }}"
+      - name: "{{ dearlavion_network }}"
     command: >
       /bin/sh -c "
         mc alias set local http://dearlavion-minio:{{ minio_internal_s3_api_port }}
