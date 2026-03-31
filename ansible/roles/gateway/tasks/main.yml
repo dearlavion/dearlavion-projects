@@ -20,7 +20,7 @@
     expose:
       - "{{ gateway_internal_port }}"
     env:
-      auth_port: "{{ auth_port }}"
-      core_port: "{{ core_port }}"
-      notification_port: "{{ notification_port }}"
-      media_port: "{{ media_port }}"
+      auth_port: "{{ auth_port | string }}"
+      core_port: "{{ core_port | string }}"
+      notification_port: "{{ notification_port | string }}"
+      media_port: "{{ media_port | string }}"
