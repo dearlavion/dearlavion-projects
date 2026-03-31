@@ -40,6 +40,11 @@
       - "{{ minio_data_dir }}:/data"
       - "{{ minio_config_dir }}:/root/.minio"
     command: "server /data --console-address :{{ minio_internal_web_console_port }}"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:{{ minio_internal_s3_api_port }}/minio/health/live" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - name: "{{ dearlavion_network }}"
 
@@ -47,7 +52,9 @@
   community.docker.docker_container_info:
     name: dearlavion-minio
   register: minio_info
-  until: minio_info.container.State.Health.Status == "healthy"
+  until: >
+    minio_info.container.State.Health is defined and
+    minio_info.container.State.Health.Status == "healthy"
   retries: 10
   delay: 5
 
