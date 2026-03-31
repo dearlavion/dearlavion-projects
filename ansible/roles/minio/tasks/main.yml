@@ -43,12 +43,11 @@
     networks:
       - name: "{{ dearlavion_network }}"
 
-- name: Wait for MinIO to be healthy
-  uri:
-    url: "http://dearlavion-minio:{{ minio_internal_s3_api_port }}/minio/health/live"
-    status_code: 200
-  register: result
-  until: result.status == 200
+- name: Wait for MinIO container to be healthy
+  community.docker.docker_container_info:
+    name: dearlavion-minio
+  register: minio_info
+  until: minio_info.container.State.Health.Status == "healthy"
   retries: 10
   delay: 5
 
