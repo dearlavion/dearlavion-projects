@@ -16,6 +16,6 @@
     state: started
     restart_policy: always
     networks:
-      - name: {{ dearlavion_network }}
+      - name: "{{ dearlavion_network }}"
     ports:
       - "{{ media_port }}:{{ media_port }}"
