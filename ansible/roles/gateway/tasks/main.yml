@@ -16,7 +16,7 @@
     state: started
     restart_policy: always
     networks:
-      - name: {{ dearlavion_network }}
+      - name: "{{ dearlavion_network }}"
     expose:
       - "{{ gateway_internal_port }}"
     env:
