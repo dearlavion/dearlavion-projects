@@ -3,8 +3,9 @@ services:
     image: nginx:1.25-alpine
     container_name: dearlavion-nginx
     ports:
-      - "80:80"    # HTTP
-      - "443:443"  # HTTPS
+      - "{{ nginx_http_port }}:80"    # HTTP
+      - "{{ nginx_https_port }}:443"  # HTTPS
+
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/dearlavion-app.conf:/etc/nginx/conf.d/default.conf:ro
@@ -13,8 +14,8 @@ services:
       - /etc/letsencrypt/renewal:/etc/letsencrypt/renewal:rw
       - /opt/dearlavion/certbot-webroot:/var/www/certbot
     networks:
-      - dearlavion-net
+      - "{{ dearlavion_network }}"
 
 networks:
-  dearlavion-net:
+  "{{ dearlavion_network }}":
     external: true

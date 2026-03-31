@@ -1,6 +1,9 @@
 # Docker network
 dearlavion_network: "dearlavion-net"
 
+# NGINx
+nginx_http_port: 80
+nginx_https_port: 443
 
 # UI Ports
 web_ui_port: 80

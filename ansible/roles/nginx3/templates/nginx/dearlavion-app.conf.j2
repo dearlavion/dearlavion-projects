@@ -30,7 +30,7 @@ upstream minio_api {
 }
 
 upstream minio_console {
-    server dearlavion-minio:{{ minio__internal_web_console_port }};
+    server dearlavion-minio:{{ minio_internal_web_console_port }};
 }
 
 # ======================
