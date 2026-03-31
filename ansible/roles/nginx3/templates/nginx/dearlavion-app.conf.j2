@@ -5,22 +5,6 @@ upstream web_ui {
     server dearlavion-web-ui:{{ web_ui_port }};
 }
 
-upstream auth_service {
-    server dearlavion-authentication-service:{{ auth_port }};
-}
-
-upstream core_service {
-    server dearlavion-core-service:{{ core_port }};
-}
-
-upstream akhq_ui {
-    server dearlavion-akhq:{{ akhq_port }};
-}
-
-upstream notification_service {
-    server dearlavion-notification-service:{{ notification_port }};
-}
-
 upstream api_gateway {
     server dearlavion-gateway-service:{{ gateway_internal_port }};
 }
