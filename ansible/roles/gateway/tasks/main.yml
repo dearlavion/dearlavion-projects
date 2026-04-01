@@ -24,3 +24,4 @@
       AUTH_PORT: "{{ auth_port | string }}"
       CORE_PORT: "{{ core_port | string }}"
       NOTIFICATION_PORT: "{{ notification_port | string }}"
+      AKHQ_PORT: "{{ akhq_port | string }}"
