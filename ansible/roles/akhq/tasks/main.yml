@@ -11,6 +11,11 @@
     src: docker-compose.akhq.yml.j2
     dest: /opt/dearlavion/akhq/docker-compose.yml
 
+- name: Stop old AKHQ container
+  become: true
+  command: docker rm -f {{ akhq_image_name }}
+  ignore_errors: true
+
 - name: Start AKHQ
   become: true
   command: docker compose up -d

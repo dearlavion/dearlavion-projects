@@ -3,7 +3,7 @@ version: "3"
 services:
   akhq:
     image: tchiotludo/akhq:latest
-    container_name: dearlavion-akhq
+    container_name: {{ akhq_image_name }}
     restart: unless-stopped
 
     ports:
