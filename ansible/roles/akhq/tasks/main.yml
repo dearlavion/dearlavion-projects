@@ -1,0 +1,18 @@
+- name: Create AKHQ base directory
+  become: true
+  file:
+    path: /opt/dearlavion/akhq
+    state: directory
+    mode: '0755'
+
+- name: Copy AKHQ docker compose
+  become: true
+  template:
+    src: docker-compose.akhq.yml.j2
+    dest: /opt/dearlavion/akhq/docker-compose.yml
+
+- name: Start AKHQ
+  become: true
+  command: docker compose up -d
+  args:
+    chdir: /opt/dearlavion/akhq

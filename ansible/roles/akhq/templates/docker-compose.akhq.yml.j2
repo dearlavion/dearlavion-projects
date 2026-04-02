@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  akhq:
+    image: tchiotludo/akhq:latest
+    container_name: akhq
+    restart: unless-stopped
+
+    ports:
+      - "{{ akhq_port }}:{{ akhq_internal_port }}"
+
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            local-kafka:
+              properties:
+                bootstrap.servers: "kafka:{{ kafka_internal_port }}"
+
+    networks:
+      - "{{ dearlavion_network }}"
+
+networks:
+  "{{ dearlavion_network }}":
+    external: true
