@@ -20,6 +20,7 @@
     renew_cert: "{{ target in ['certificate', 'all'] }}"
     run_kafka: "{{ target in ['kafka', 'all'] }}"
     run_minio: "{{ target in ['minio', 'all'] }}"
+    run_akhq: "{{ target in ['akhq', 'all'] }}"
 
   pre_tasks:
     - name: Setup system dependencies
@@ -74,6 +75,10 @@
     - include_role:
         name: minio
       when: run_minio
+
+    - include_role:
+        name: akhq
+      when: run_akhq
 
   post_tasks:
     # ----------------------------
