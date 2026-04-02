@@ -19,8 +19,9 @@
   template:
     src: docker-compose.kafka.yml.j2
     dest: /opt/dearlavion/kafka/docker-compose.yml
+    mode: '0644'
 
-- name: Start Kafka and AKHQ
+- name: Start Kafka
   become: true
   command: docker compose up -d
   args:

@@ -3,10 +3,10 @@ version: "3"
 services:
   kafka:
     image: apache/kafka:4.1.1
-    container_name: kafka
+    container_name: {{ kafka_image_name }}
     restart: unless-stopped
     networks:
-      - dearlavion-net
+      - "{{ dearlavion_network }}"
     ports:
       - "{{ kafka_internal_port }}:{{ kafka_internal_port }}"    # internal docker
       - "{{ kafka_external_port }}:{{ kafka_external_port }}"  # host access
@@ -37,26 +37,6 @@ services:
     volumes:
       - ./kafka:/var/lib/kafka/data
 
-  akhq:
-    image: tchiotludo/akhq:latest
-    container_name: dearlavion-akhq
-    restart: unless-stopped
-    networks:
-      - "{{ daerlavion_network }}"
-    ports:
-      - "{{ akhq_port }}:{{ akhq_internal_port }}"
-
-    environment:
-      AKHQ_CONFIGURATION: |
-        akhq:
-          connections:
-            local-kafka:
-              properties:
-                bootstrap.servers: "kafka:{{ kafka_internal_port }}"
-
-    depends_on:
-      - kafka
-
 networks:
-  dearlavion-net:
+  "{{ dearlavion_network }}":
     external: true
