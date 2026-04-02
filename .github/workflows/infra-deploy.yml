@@ -9,6 +9,7 @@ on:
         required: true
         type: choice
         options:
+          - akhq
           - nginx
           - redis
           - certificate
