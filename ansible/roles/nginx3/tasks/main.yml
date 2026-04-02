@@ -37,8 +37,7 @@
     --non-interactive
     --agree-tos
     -m {{ email }}
-  args:
-    creates: "/etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem"
+    --expand
 
 - name: Setup Dear Lavion NGINX
   include_tasks: main_nginx.yml

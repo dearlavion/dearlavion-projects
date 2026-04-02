@@ -22,7 +22,7 @@ upstream minio_console {
 # ======================
 server {
     listen 443 ssl;
-    server_name {{ server_names | join(' ') }};
+    server_name {{ main_server_name }};
 
     ssl_certificate /etc/letsencrypt/live/{{ server_names[0] }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ server_names[0] }}/privkey.pem;

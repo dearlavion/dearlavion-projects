@@ -1,3 +1,4 @@
 nginx_container_name: dearlavion-nginx
-server_names: ['dearlavion.site']
+server_names: ['dearlavion.site', 's3.dearlavion.site', 'console-s3.dearlavion.site']
 email: 'dearlavion@gmail.com'
+main_server_name: 'dearlavion.site'

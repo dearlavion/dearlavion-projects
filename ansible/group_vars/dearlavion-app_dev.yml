@@ -24,7 +24,10 @@ minio_internal_web_console_port: 9001
 minio_server_url: "s3.dearlavion.site"
 minio_browser_url: "console-s3.dearlavion.site"
 
+# NGINX SSL
 server_names:
   - dearlavion.site
+  - s3.dearlavion.site
+  - console-s3.dearlavion.site
 
 renew_cert: false
