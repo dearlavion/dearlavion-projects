@@ -16,7 +16,11 @@ notification_port: 8083
 media_port: 8084
 
 # Kafka
-akhq_port: 9000
+kafka_internal_port: 9092
+kafka_external_port: 29092
+kafka_controller_port: 9093
+akhq_internal_port: 8080
+akhq_port: 9080
 
 # Image Server
 minio_internal_s3_api_port: 9000
