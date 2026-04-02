@@ -37,6 +37,9 @@
       MINIO_ROOT_PASSWORD: "{{ minio_root_password }}"
       MINIO_SERVER_URL: "https://{{ minio_server_url }}"
       MINIO_BROWSER_REDIRECT_URL: "https://{{ minio_browser_url }}"
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - "{{ minio_data_dir }}:/data"
       - "{{ minio_config_dir }}:/root/.minio"
