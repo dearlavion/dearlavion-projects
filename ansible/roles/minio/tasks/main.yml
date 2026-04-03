@@ -139,15 +139,12 @@
 # =====================================================
 
 - name: Create MinIO bucket and policy
-  command: >
-    docker run --rm --network {{ dearlavion_network }}
-    minio/mc:{{ minio_mc_image_tag }}
-    /bin/sh -c "
-      set -e;
-      mc alias set local http://dearlavion-minio:{{ minio_internal_s3_api_port }} {{ minio_root_user }} {{ minio_root_password }};
-      mc mb --ignore-existing local/{{ minio_bucket }};
-      mc anonymous set download local/{{ minio_bucket }};
-    "
+  shell: |
+    docker run --rm --network {{ dearlavion_network }} \
+    minio/mc:{{ minio_mc_image_tag }} \
+    mc alias set local http://dearlavion-minio:{{ minio_internal_s3_api_port }} {{ minio_root_user }} {{ minio_root_password }} && \
+    mc mb --ignore-existing local/{{ minio_bucket }} && \
+    mc anonymous set download local/{{ minio_bucket }}
   register: bucket_result
   retries: 10
   delay: 5
