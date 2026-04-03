@@ -1,7 +1,61 @@
 ---
 # roles/minio/tasks/main.yml
-# Deploys MinIO as a persistent Docker container on the dev server.
-# Run this ONCE (or when upgrading MinIO) — NOT on every app deploy.
+
+# =====================================================
+# 0. CLEANUP (OPTIONAL FULL RESET)
+# =====================================================
+
+- name: Stop MinIO container (cleanup)
+  community.docker.docker_container:
+    name: dearlavion-minio
+    state: stopped
+  ignore_errors: true
+  #when: minio_cleanup | default(false)
+
+- name: Remove MinIO container (cleanup)
+  community.docker.docker_container:
+    name: dearlavion-minio
+    state: absent
+    force_kill: true
+  ignore_errors: true
+  #when: minio_cleanup | default(false)
+
+- name: Remove MinIO data directory (DANGEROUS)
+  become: true
+  file:
+    path: "{{ minio_data_dir }}"
+    state: absent
+  #when: minio_cleanup | default(false)
+
+- name: Remove MinIO config directory (cleanup)
+  become: true
+  file:
+    path: "{{ minio_config_dir }}"
+    state: absent
+  #when: minio_cleanup | default(false)
+
+- name: Recreate MinIO data directory
+  become: true
+  file:
+    path: "{{ minio_data_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+  when: minio_cleanup | default(false)
+
+- name: Recreate MinIO config directory
+  become: true
+  file:
+    path: "{{ minio_config_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+  #when: minio_cleanup | default(false)
+
+
+# =====================================================
+# 1. CREATE DIRECTORIES (NORMAL FLOW)
+# =====================================================
 
 - name: Create MinIO data directory
   become: true
@@ -10,6 +64,7 @@
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0755'
+  #when: not minio_cleanup | default(false)
 
 - name: Create MinIO config directory
   become: true
@@ -18,12 +73,29 @@
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0755'
+  #when: not minio_cleanup | default(false)
+
+
+# =====================================================
+# 2. PULL IMAGES
+# =====================================================
 
 - name: Pull MinIO image
   community.docker.docker_image:
     name: minio/minio
     tag: "{{ minio_image_tag }}"
     source: pull
+
+- name: Pull MinIO MC image
+  community.docker.docker_image:
+    name: minio/mc
+    tag: "{{ minio_mc_image_tag }}"
+    source: pull
+
+
+# =====================================================
+# 3. RUN MINIO CONTAINER
+# =====================================================
 
 - name: Run MinIO container
   community.docker.docker_container:
@@ -44,47 +116,44 @@
       - "{{ minio_data_dir }}:/data"
       - "{{ minio_config_dir }}:/root/.minio"
     command: "server /data --console-address :{{ minio_internal_web_console_port }}"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:{{ minio_internal_s3_api_port }}/minio/health/live" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - name: "{{ dearlavion_network }}"
 
-- name: Wait for MinIO container to be healthy
-  community.docker.docker_container_info:
-    name: dearlavion-minio
-  register: minio_info
-  until: >
-    minio_info.container.State.Health is defined and
-    minio_info.container.State.Health.Status == "healthy"
+
+# =====================================================
+# 4. WAIT FOR MINIO API READY
+# =====================================================
+
+- name: Wait for MinIO API
+  uri:
+    url: "http://127.0.0.1:{{ minio_internal_s3_api_port }}/minio/health/ready"
+    status_code: 200
+  register: minio_ready
+  retries: 20
+  delay: 3
+  until: minio_ready.status == 200
+
+
+# =====================================================
+# 5. CREATE BUCKET (SAFE + RETRY)
+# =====================================================
+
+- name: Create MinIO bucket and policy
+  command: >
+    docker run --rm --network {{ dearlavion_network }}
+    minio/mc:{{ minio_mc_image_tag }}
+    /bin/sh -c "
+      set -e;
+
+      echo 'Waiting for MinIO...';
+      until mc alias set local http://dearlavion-minio:{{ minio_internal_s3_api_port }} {{ minio_root_user }} {{ minio_root_password }}; do
+        sleep 3;
+      done;
+
+      mc mb --ignore-existing local/{{ minio_bucket }};
+      mc anonymous set download local/{{ minio_bucket }};
+    "
+  register: bucket_result
   retries: 10
   delay: 5
-
-# Create the bucket on first startup
-- name: Pull MinIO mc client image
-  community.docker.docker_image:
-    name: minio/mc
-    tag: "{{ minio_mc_image_tag }}"
-    source: pull
-
-- name: Create MinIO bucket (retry until success)
-  community.docker.docker_container:
-    name: minio-init
-    image: "minio/mc:{{ minio_mc_image_tag }}"
-    state: started
-    auto_remove: true
-    networks:
-      - name: "{{ dearlavion_network }}"
-    command: >
-      /bin/sh -c "
-        mc alias set local http://dearlavion-minio:{{ minio_internal_s3_api_port }}
-        {{ minio_root_user }} {{ minio_root_password }} &&
-        mc mb --ignore-existing local/{{ minio_bucket }} &&
-        mc anonymous set download local/{{ minio_bucket }}
-      "
-  register: bucket_result
-  retries: 5
-  delay: 5
-  until: bucket_result is succeeded
+  until: bucket_result.rc == 0
