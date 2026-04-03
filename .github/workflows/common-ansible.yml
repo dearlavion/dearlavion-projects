@@ -10,6 +10,9 @@ on:
       env:
         required: true
         type: string
+      reset:
+        required: false
+        type: boolean
 
 jobs:
   ansible:
@@ -50,5 +53,5 @@ jobs:
         run: |
           export PATH=$HOME/.local/bin:$PATH
           ansible-playbook playbook/site.yml \
-            -e "target=${{ inputs.target }} env=${{ inputs.env }} \
+            -e "target=${{ inputs.target }} env=${{ inputs.env }} reset=${{ inputs.reset }} \
             ghcr_pat=${{ secrets.DEARLAVION_PAT }}"

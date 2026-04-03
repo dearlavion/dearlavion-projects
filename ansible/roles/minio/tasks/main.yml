@@ -10,7 +10,7 @@
     name: dearlavion-minio
     state: stopped
   ignore_errors: true
-  #when: minio_cleanup | default(false)
+  when: reset | default(false)
 
 - name: Remove MinIO container (cleanup)
   community.docker.docker_container:
@@ -18,21 +18,21 @@
     state: absent
     force_kill: true
   ignore_errors: true
-  #when: minio_cleanup | default(false)
+  when: reset | default(false)
 
 - name: Remove MinIO data directory (DANGEROUS)
   become: true
   file:
     path: "{{ minio_data_dir }}"
     state: absent
-  #when: minio_cleanup | default(false)
+  when: reset | default(false)
 
 - name: Remove MinIO config directory (cleanup)
   become: true
   file:
     path: "{{ minio_config_dir }}"
     state: absent
-  #when: minio_cleanup | default(false)
+  when: reset | default(false)
 
 - name: Recreate MinIO data directory
   become: true
@@ -41,7 +41,7 @@
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0755'
-  when: minio_cleanup | default(false)
+  when: reset | default(false)
 
 - name: Recreate MinIO config directory
   become: true
@@ -50,8 +50,7 @@
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0755'
-  #when: minio_cleanup | default(false)
-
+  when: reset | default(false)
 
 # =====================================================
 # 1. CREATE DIRECTORIES (NORMAL FLOW)
@@ -64,7 +63,6 @@
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0755'
-  #when: not minio_cleanup | default(false)
 
 - name: Create MinIO config directory
   become: true
@@ -73,8 +71,6 @@
     state: directory
     owner: "{{ ansible_user }}"
     mode: '0755'
-  #when: not minio_cleanup | default(false)
-
 
 # =====================================================
 # 2. PULL IMAGES

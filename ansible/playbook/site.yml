@@ -4,6 +4,7 @@
   gather_facts: yes
 
   vars:
+    reset: "{{ reset | default(false) }}"
     # UI
     run_web_ui: "{{ target in ['web-ui', 'all'] }}"
 
@@ -75,6 +76,8 @@
     - include_role:
         name: minio
       when: run_minio
+      vars:
+        reset: "{{ reset | default(false) }}"
 
     - include_role:
         name: akhq

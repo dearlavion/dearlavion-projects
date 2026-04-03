@@ -17,6 +17,11 @@ on:
           - media
       env:
         default: dev
+      reset:
+        description: "Reset a service | default(false)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
@@ -49,4 +54,5 @@ jobs:
     with:
       target: ${{ inputs.service }}
       env: ${{ inputs.env }}
+      reset: ${{ inputs.reset }}
     secrets: inherit
